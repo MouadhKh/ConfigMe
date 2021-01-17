@@ -2,26 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aacb4c6a-a4fd-4ab9-a47a-f5c3bad3a107" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Configs/AddRepositories/AddRepositories.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Configs/AddRepositories/AddRepositories.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Configs/AddRepositories/RepositoryAction.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Configs/ManagePipelines/ManagePipelines.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Configs/ManagePipelines/ManagePipelines.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Configs/ManagePipelines/PipelineAction.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/OrganizationUtils.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Configs/ManagePipelines/ManagePipelines.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/UIInteractions/UIDialog.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/DefinitionUtils.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/PipelineUtils.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/ServiceEndpointUtils.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MouadhKh.BooksAPIConfig-1.1.8.vsix" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/MouadhKh.BooksAPIConfig-1.1.9.vsix" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MouadhKh.BooksAPIConfig-1.9.9.vsix" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/azure-devops-extension.json" beforeDir="false" afterPath="$PROJECT_DIR$/azure-devops-extension.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/RepositoryActions/RepositoryActions.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/RepositoryActions/RepositoryActions.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/RepositoryActions/RepositoryActions.js.LICENSE.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Configs/RepositoryActions/RepositoryActions.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/Configs/AddRepositories/AddRepositories.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Configs/RepositoryActions/RepositoryActions.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Configs/RepositoryActions/RepositoryActions.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Configs/RepositoryActions/test.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/ManagePipelines/ManagePipelines.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/ManagePipelines/ManagePipelines.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Configs/AddRepositories/AddRepositories.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Configs/AddRepositories/AddRepositories.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Configs/ManagePipelines/ManagePipelines.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Configs/ManagePipelines/ManagePipelines.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Configs/ManagePipelines/PipelineAction.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Configs/ManagePipelines/PipelineAction.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/ProjectUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/ProjectUtils.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utils/RepositoryUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/RepositoryUtils.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
     </list>
@@ -57,19 +52,6 @@
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
   </component>
-  <component name="RunManager">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -81,7 +63,11 @@
       <workItem from="1610568646415" duration="65000" />
       <workItem from="1610750461036" duration="29000" />
       <workItem from="1610750513189" duration="293000" />
-      <workItem from="1610792187158" duration="26241000" />
+      <workItem from="1610792187158" duration="26625000" />
+      <workItem from="1610874952103" duration="8027000" />
+      <workItem from="1610884911713" duration="16558000" />
+      <workItem from="1610910438132" duration="2583000" />
+      <workItem from="1610913039379" duration="5034000" />
     </task>
     <servers />
   </component>
@@ -98,6 +84,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

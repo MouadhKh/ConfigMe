@@ -3,6 +3,8 @@
 //import * as SDK from "azure-devops-extension-sdk";
 import axios from 'axios';
 import {AUTH_HEADER} from "../auth";
+import {getOrganizationName} from "./OrganizationUtils";
+import {getCurrentProjectName} from "./ProjectUtils";
 
 const ENDPOINT = "https://dev.azure.com/ORG_NAME/PROJECT_NAME/_apis/git/repositories?api-version=6.0";
 
@@ -26,7 +28,7 @@ export async function createRepositories(organizationName: string, projectName: 
 
 export async function createRepository(organizationName: string, projectId: string, repoName: string, skip: boolean = false) {
     if (skip) {
-        return getRepositoryByName(organizationName, projectId, repoName);
+        return getRepositoryByName(repoName);
     }
     let body = {
         name: repoName,
@@ -62,7 +64,9 @@ export function listRepositories(organizationName: string, projectName: string) 
  * @param projectName
  * @param repoName
  */
-export async function getRepositoryByName(organizationName: string, projectName: string, repoName: string) {
+export async function getRepositoryByName(repoName: string) {
+    const organizationName = await getOrganizationName();
+    const projectName = await getCurrentProjectName();
     return await listRepositories(organizationName, projectName)
         .then((repositories: any[]) => {
             const foundRepo = repositories.filter(repo => repo.name === repoName);

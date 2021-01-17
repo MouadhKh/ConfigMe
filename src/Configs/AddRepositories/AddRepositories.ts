@@ -20,6 +20,7 @@ SDK.init().then(() => {
             return {
                 execute: async () => {
                     //TODO find a better way to make it dynamic
+                    //TODO find a way to find main repository
                     // this only works because we can assume that main repository = project name
                     await repositoryAction.createRepo(await getCurrentProjectName(),
                         "https://dev.azure.com/mouadh-kh/BooksAPI/_git/BooksAPI", true);
