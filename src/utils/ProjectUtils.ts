@@ -1,10 +1,12 @@
 import * as SDK from "azure-devops-extension-sdk";
-import { CommonServiceIds, IProjectPageService } from "azure-devops-extension-api";
+import {CommonServiceIds, IProjectPageService} from "azure-devops-extension-api";
 import axios from "axios";
-import { AUTH_HEADER } from "../auth";
+import {AUTH_HEADER, getAuthHeader} from "../auth";
+
+// import {AUTH_HEADER} from "../auth";
 
 /**
-   * When SDK is used the project Name in the current page get fetched
+ * When SDK is used the project Name in the current page get fetched
  */
 export async function getCurrentProjectId(): Promise<string> {
     let projectService = await SDK.getService<IProjectPageService>(CommonServiceIds.ProjectPageService);
@@ -33,20 +35,27 @@ export async function getCurrentProjectName(): Promise<string> {
     return "INVALID_GET_PROJECT_NAME";//supposed to be an error code
 }
 
-export async function listProjectsByOrganization(organizationName: string) {
+export async function listProjectsByOrganization(organizationName: string, token: string) {
     const url = `https://dev.azure.com/${organizationName}/_apis/projects?api-version=6.0`
-    return axios.get(url, { headers: AUTH_HEADER });
+    let authHeader = getAuthHeader(token);
+    const response = axios.get(url, {
+            headers: authHeader
+            // 'Authorization': authHeader
+
+        }
+    );
+    console.log("response cors:", response);
+    return response;
 }
 
-export async function getProjectByName(organizationName: string, projectName: string) {
+export async function getProjectByName(organizationName: string, projectName: string, token: string) {
     //bad: can cause problems
-    let foundProjects = await (await listProjectsByOrganization(organizationName)).data.value.filter((project: any) =>
+    let foundProjects = await (await listProjectsByOrganization(organizationName, token)).data.value.filter((project: any) =>
         project.name === projectName);
     if (foundProjects.length > 0) {
         console.log("project found " + foundProjects[0]);
         return foundProjects[0];
-    }
-    else {
+    } else {
         console.log(`No project called ${projectName} found`)
     }
 }

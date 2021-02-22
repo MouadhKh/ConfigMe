@@ -22,6 +22,7 @@ class PipelineAction {
             .then(() => new UIDialog(`Pipeline created successfully`).showSimpleDialog());
     }
 
+    //TODO use decorator for organizationName....
     public async triggerPipeline(pipelineName: string) {
         //Todo find suitable pattern to extract those as class property
         const organizationName = await getOrganizationName();

@@ -1,4 +1,3 @@
-import "es6-promise/auto";
 import * as SDK from "azure-devops-extension-sdk";
 import RepositoryAction from "./RepositoryAction";
 import {getCurrentProjectName} from "../../utils/ProjectUtils";

@@ -17,9 +17,9 @@ class RepositoryAction {
         const dialogSvc = await SDK.getService<IHostPageLayoutService>(CommonServiceIds.HostPageLayoutService);
         const organizationName = await getOrganizationName();
         const projectName = await getCurrentProjectName();
+        const currentProjectId: string = await getCurrentProjectId();
         let existingRepos = await listRepositories(organizationName, projectName);
         let existingReposNames = existingRepos.map((repo: any) => repo.name);
-        const currentProjectId: string = await getCurrentProjectId();
         if (existingReposNames.includes(repoToCreate) && !skip) {
             dialogSvc.openMessageDialog(`Repository ${repoToCreate} already exists`, {showCancel: false});
         } else {

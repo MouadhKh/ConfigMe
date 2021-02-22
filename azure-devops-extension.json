@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "BooksAPIConfig",
   "publisher": "MouadhKh",
-  "version": "2.3.5",
+  "version": "3.6.1",
   "name": "Extension Books-API Config",
   "description": "Azure DevOps extension sample",
   "categories": [

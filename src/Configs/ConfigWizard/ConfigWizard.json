@@ -1,0 +1,19 @@
+{
+  "contributions": [
+    {
+      "id": "config_wizard",
+      "type": "ms.vss-web.hub",
+      "targets": [
+        "ms.vss-build-web.build-release-hub-group"
+      ],
+      "properties": {
+        "name": "ConfigMe",
+        "uri": "dist/ConfigWizard/ConfigWizard.html",
+        "icon": "asset://static/pipeline-management.png"
+      }
+    }
+  ],
+  "scopes": [
+    "vso.build"
+  ]
+}
