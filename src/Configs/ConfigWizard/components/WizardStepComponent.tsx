@@ -10,18 +10,14 @@ interface IWizardStepProps {
     nextOnClick: Function
 }
 
-export default class WizardStepComponent extends React.Component<IWizardStepProps, {}> {
-    constructor(props: IWizardStepProps) {
-        super(props);
-    }
-
-    insertSeparation() {
+export const WizardStepComponent = (props: IWizardStepProps) => {
+    const insertSeparation = () => {
         const insert = (arr: JSX.Element[], index: number, newItem: JSX.Element) => [
             ...arr.slice(0, index),
             newItem,
             ...arr.slice(index)
         ];
-        let componentsCopy = this.props.components;
+        let componentsCopy = props.components;
         for (let i = 0; i < componentsCopy.length; i++) {
             if (i % 2 == 1) {
                 console.log("entered");
@@ -31,23 +27,19 @@ export default class WizardStepComponent extends React.Component<IWizardStepProp
         }
         return componentsCopy;
     }
-
-    render() {
-
-        return (<Card border="primary" className="text-center m-4">
-            <Card.Header>Project Configuration Wizard <GrConfigure/></Card.Header>
-            <Card.Body>
-                <Card.Title>{this.props.title}</Card.Title>
-                <Card.Text>
-                    {this.insertSeparation().map((component, i) => {
-                        return <div key={i}>{component}</div>;
-                    })}
-                    <Button className="float-right" variant="outline-primary"
-                            onClick={() => this.props.nextOnClick()}>Next <FcNext/></Button>
-                </Card.Text>
-            </Card.Body>
-            <Card.Footer className="text-muted"><AiFillCopyrightCircle/> Mouadh Khlifi
-                2021</Card.Footer>
-        </Card>);
-    }
+    return (<Card border="primary" className="text-center m-4">
+        <Card.Header>Project Configuration Wizard <GrConfigure/></Card.Header>
+        <Card.Body>
+            <Card.Title>{props.title}</Card.Title>
+            <Card.Text>
+                {insertSeparation().map((component, i) => {
+                    return <div key={i}>{component}</div>;
+                })}
+                <Button className="float-right" variant="outline-primary"
+                        onClick={() => props.nextOnClick()}>Next <FcNext/></Button>
+            </Card.Text>
+        </Card.Body>
+        <Card.Footer className="text-muted"><AiFillCopyrightCircle/> Mouadh Khlifi
+            2021</Card.Footer>
+    </Card>);
 }
