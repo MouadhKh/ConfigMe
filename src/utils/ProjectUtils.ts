@@ -8,7 +8,7 @@ import {AUTH_HEADER, getAuthHeader} from "../auth";
 /**
  * When SDK is used the project Name in the current page get fetched
  */
-export async function getCurrentProjectId(): Promise<string> {
+export async function getCurrentProjectId() {
     let projectService = await SDK.getService<IProjectPageService>(CommonServiceIds.ProjectPageService);
     let res = await projectService.getProject().then((response) => {
         console.log("project id: " + response?.id);

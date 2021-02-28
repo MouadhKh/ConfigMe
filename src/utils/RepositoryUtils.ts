@@ -2,7 +2,7 @@
 //import { GitRestClient } from "azure-devops-extension-api/Git";
 //import * as SDK from "azure-devops-extension-sdk";
 import axios from 'axios';
-import {AUTH_HEADER} from "../auth";
+import {AUTH_HEADER, getAuthHeader} from "../auth";
 import {getOrganizationName} from "./OrganizationUtils";
 import {getCurrentProjectName} from "./ProjectUtils";
 
@@ -13,8 +13,8 @@ const ENDPOINT = "https://dev.azure.com/ORG_NAME/PROJECT_NAME/_apis/git/reposito
  * @param url
  * @param repositoriesNames
  */
-export async function createRepositories(organizationName: string, projectName: string, repositoriesNames: string[]) {
-    return axios.all(repositoriesNames.map((repoName) => createRepository(organizationName, projectName, repoName)));
+export async function createRepositories(organizationName: string, projectName: string, repositoriesNames: string[], azureToken: string) {
+    return axios.all(repositoriesNames.map((repoName) => createRepository(organizationName, projectName, repoName, azureToken)));
 }
 
 /**
@@ -26,9 +26,10 @@ export async function createRepositories(organizationName: string, projectName: 
  * @param skip
  */
 
-export async function createRepository(organizationName: string, projectId: string, repoName: string, skip: boolean = false) {
+export async function createRepository(organizationName: string, projectId: string, repoName: string, azureToken: string, skip: boolean = false) {
+    //TODO delete the if
     if (skip) {
-        return getRepositoryByName(repoName);
+        return getRepositoryByName(repoName, azureToken);
     }
     let body = {
         name: repoName,
@@ -37,13 +38,14 @@ export async function createRepository(organizationName: string, projectId: stri
         }
     }
     const url = ENDPOINT.split("PROJECT_NAME").join(projectId).split("ORG_NAME").join(organizationName);
-    return axios.post(url, body, {headers: AUTH_HEADER})
+    const authHeader = getAuthHeader(azureToken);
+    return axios.post(url, body, {headers: authHeader})
         .then((response) => {
             console.log(`Repo ${body.name} created successfully`)
             return response.data;
         }).catch(() => {
             console.log('url:' + url);
-            console.log('header:' + AUTH_HEADER.Authorization);
+            console.log('header:' + authHeader.Authorization);
             console.log('body:' + body.project.id);
             console.log(`Error creating ${body.name}`)
         });
@@ -51,10 +53,11 @@ export async function createRepository(organizationName: string, projectId: stri
 }
 
 
-export function listRepositories(organizationName: string, projectName: string) {
+export function listRepositories(organizationName: string, projectName: string, azureToken: string) {
+    const authHeader = getAuthHeader(azureToken);
+    //TODO es muss einheitlich sein
     const url = ENDPOINT.split("PROJECT_NAME").join(projectName).split("ORG_NAME").join(organizationName);
-    return axios.get(url, {headers: AUTH_HEADER}).then(response => response.data.value)
-        .catch(err => "Error occured when fetching repositories" + err);
+    return axios.get(url, {headers: authHeader}).then(response => response.data.value).catch(err => "Error occured when fetching repositories" + err);
 }
 
 /**
@@ -64,10 +67,10 @@ export function listRepositories(organizationName: string, projectName: string) 
  * @param projectName
  * @param repoName
  */
-export async function getRepositoryByName(repoName: string) {
+export async function getRepositoryByName(repoName: string, azureToken: string) {
     const organizationName = await getOrganizationName();
     const projectName = await getCurrentProjectName();
-    return await listRepositories(organizationName, projectName)
+    return await listRepositories(organizationName, projectName, azureToken)
         .then((repositories: any[]) => {
             const foundRepo = repositories.filter(repo => repo.name === repoName);
             if (foundRepo.length > 0) {
@@ -111,34 +114,45 @@ export async function copyRepository(targetOrganizationName: string, sourceProje
     });
 }
 
-export async function getRepositoryById(organizationName: string, repositoryId: string) {
+export async function getRepositoryById(organizationName: string, repositoryId: string, azureToken: string) {
     const url = `https://dev.azure.com/${organizationName}/_apis/git/repositories/${repositoryId}?api-version=6.0`;
-    return axios.get(url, {headers: AUTH_HEADER}).then(response => {
+    const authHeader = getAuthHeader(azureToken);
+    return axios.get(url, {headers: authHeader}).then(response => {
         console.log("getRepositoryById log : " + response)
         return response.data;
     });
 }
 
-/**
- *
- * https://docs.microsoft.com/en-us/rest/api/azure/devops/git/import%20requests/create?view=azure-devops-rest-6.0
- * @param organizationName
- * @param projectIdOrName
- * @param repositoryId
- * @param sourceUrl
- */
-export async function importRepository(organizationName: string, projectIdOrName: string, repositoryId: string, sourceUrl: string) {
+
+export async function importRepository(organizationName: string, projectIdOrName: string,
+                                       repositoryId: string, sourceUrl: string, token: string) {
     const url = `https://dev.azure.com/${organizationName}/${projectIdOrName}/_apis/git/repositories/${repositoryId}/importRequests?api-version=6.0-preview.1`
     const body = {
         parameters: {
+            //TODO investigate effects
             deleteServiceEndpointAfterImportIsDone: true,
             gitSource: {
                 url: sourceUrl
             }
         }
     }
-    return axios.post(url, body, {headers: AUTH_HEADER}).then((response) => {
+    return axios.post(url, body, {headers: getAuthHeader(token)}).then((response) => {
         console.log("Import successful : ", response);
         return response;
     }).catch((err) => console.log("Error importing the repository", err));
+}
+
+export async function deleteRepository(organizationName: string, projectName: string, repositoryName: string, azureToken: string) {
+    let repositoryId = await getRepositoryByName(repositoryName, azureToken).then(repository => repository.id);
+    console.log("in delete repository id", repositoryId)
+    const url = `https://dev.azure.com/${organizationName}/${projectName}/_apis/git/repositories/${repositoryId}?api-version=6.0`;
+    const authHeader = getAuthHeader(azureToken);
+    return axios.delete(url, {headers: authHeader}).then((response) => console.log(response));
+}
+
+//TODO maybe use decorators to avoid azureToken as parameter
+export async function isRepositoryEmpty(repositoryName: string, azureToken: string): Promise<boolean> {
+    return getRepositoryByName(repositoryName, azureToken).then(repository =>
+        repository.size == 0
+    );
 }

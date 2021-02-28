@@ -14,6 +14,10 @@
     }
   ],
   "scopes": [
-    "vso.build"
+    "vso.build",
+    "vso.code_full",
+    "vso.agentpools",
+    "vso.build_execute",
+    "vso.tokens"
   ]
 }

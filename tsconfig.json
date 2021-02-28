@@ -16,7 +16,8 @@
             "es6",
             "es7",
             "dom",
-            "es2015.promise"
+            "es2015.promise",
+            "es2017"
         ],
         "types": [
             "react"
