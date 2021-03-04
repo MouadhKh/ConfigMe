@@ -4,7 +4,6 @@ export async function getOrganizationName() {
     // await SDK.init();
     return SDK.getAccessToken()
         .then(() => {
-                console.log("Organization:" + SDK.getHost().name);
                 return SDK.getHost().name
             }
         )

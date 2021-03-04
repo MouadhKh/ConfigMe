@@ -1,5 +1,9 @@
-import {AUTH_HEADER} from "../auth";
+import {AUTH_HEADER, getAuthHeader} from "../auth";
 import axios from "axios";
+import {getOrganizationName} from "./OrganizationUtils";
+import {getRepositoryId} from "./RepositoryUtils";
+import {getCurrentProjectName} from "./ProjectUtils";
+import {extractFileName} from "./ContentUtils";
 
 export async function listBranches(organizationName: string, projectIdOrName: string) {
     const url = `https://dev.azure.com/{organization}/${projectIdOrName}/_apis/tfvc/branches?path=$/&api-version=6.0`
@@ -8,6 +12,7 @@ export async function listBranches(organizationName: string, projectIdOrName: st
         return response.data;
     });
 }
+
 
 /**
  * Create an empty branch initialized by a README file
@@ -54,10 +59,13 @@ export async function createBranch(organizationName: string, repositoryId: strin
 
 }
 
-export async function listRefs(organizationName: string, projectIdOrName: string, repositoryId: string) {
-    const url = `https://dev.azure.com/${organizationName}/${projectIdOrName}/_apis/git/repositories/${repositoryId}/refs?api-version=6.0`;
-    return axios.get(url, {headers: AUTH_HEADER}).then(response => response.data.value)
-        .catch((err) => console.log("error fetching refs list", err));
+export async function getRefs(repositoryName: string, azureToken: string) {
+    const organizationName = await getOrganizationName();
+    const repositoryId = await getRepositoryId(repositoryName, azureToken);
+    const projectName = await getCurrentProjectName();
+    const url = `https://dev.azure.com/${organizationName}/${projectName}/_apis/git/repositories/${repositoryId}/refs?api-version=6.0`;
+    const authHeader = getAuthHeader(azureToken);
+    return axios.get(url, {headers: authHeader}).then(response => response.data.value);
 }
 
 /**
@@ -67,10 +75,21 @@ export async function listRefs(organizationName: string, projectIdOrName: string
  * @param repositoryId
  * @param refName
  */
-export async function getRefObjectId(organizationName: string, projectIdOrName: string, repositoryId: string, refName: string) {
-    const refs = await listRefs(organizationName, projectIdOrName, repositoryId);
+export async function getRefObjectId(repositoryName: string, refName: string, azureToken: string) {
+    const projectName = await getCurrentProjectName();
+    const refs = await getRefs(repositoryName, azureToken);
     const foundRef = refs.filter((ref: any) => ref.name === refName);
     if (foundRef.length > 0) {
-        return foundRef[0];
+        return foundRef[0].objectId;
     }
+}
+
+function extractBranchName(refString: string): string {
+    return refString.substring(refString.lastIndexOf("/") + 1);
+}
+
+export async function getBranchNames(repositoryName: string, azureToken: string) {
+    return getRefs(repositoryName, azureToken).then(refs => {
+        return refs.map((ref: any) => extractBranchName(ref.name))
+    });
 }

@@ -8,7 +8,7 @@ interface IDeleteConfirmation {
     onConfirm: any
 }
 
-export const DeleteConfirmationModal = ({show, onHide, onConfirm}: IDeleteConfirmation) => {
+export const RepositoryDeleteConfirmationModal = ({show, onHide, onConfirm}: IDeleteConfirmation) => {
     return (<Modal centered show={show} onHide={onHide}>
         <Modal.Header closeButton>
             <Modal.Title>Repository Deletion</Modal.Title>

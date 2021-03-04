@@ -1,6 +1,10 @@
 import * as SDK from "azure-devops-extension-sdk";
 import {BuildRestClient} from "azure-devops-extension-api/Build";
 import {getClient} from "azure-devops-extension-api";
+import {getCurrentProjectName} from "./ProjectUtils";
+import {getOrganizationName} from "./OrganizationUtils";
+import {getRepositoryId} from "./RepositoryUtils";
+import {getAuthHeader} from "../auth";
 
 export async function listDefinitions(projectNameOrId: string, definitionName?: string, repositoryId?: string) {
     //TODO find a better place for SDK.init()
@@ -12,8 +16,10 @@ export async function listDefinitions(projectNameOrId: string, definitionName?: 
     );
 }
 
-export async function getDefinitionByName(projectNameOrId: string, definitionName: string, repositoryId?: string) {
-    const definitions = await listDefinitions(projectNameOrId, definitionName, repositoryId);
+export async function getDefinitionByName(repositoryName: string, definitionName: string, azureToken: string) {
+    const projectName = await getCurrentProjectName();
+    const repositoryId = await getRepositoryId(repositoryName, azureToken);
+    const definitions = await listDefinitions(projectName, definitionName, repositoryId);
     //Strict equality here because getDefinitions() only follow a pattern(TODO investigate more here)
     const foundDefinitions = definitions.filter((definition: any) => definition.name === definitionName);
     if (foundDefinitions.length > 0) {

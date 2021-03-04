@@ -11,7 +11,6 @@ import {AUTH_HEADER, getAuthHeader} from "../auth";
 export async function getCurrentProjectId() {
     let projectService = await SDK.getService<IProjectPageService>(CommonServiceIds.ProjectPageService);
     let res = await projectService.getProject().then((response) => {
-        console.log("project id: " + response?.id);
         return response?.id;
     }).catch((err) => console.log("Error Retrieving Project Id: " + err));
     if (res != undefined) {

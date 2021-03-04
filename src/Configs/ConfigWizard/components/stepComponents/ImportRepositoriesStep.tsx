@@ -1,24 +1,22 @@
-import {getOrganizationName} from "../../../utils/OrganizationUtils";
+import {getOrganizationName} from "../../../../utils/OrganizationUtils";
 import * as React from "react";
-import {getCurrentProjectId, getCurrentProjectName} from "../../../utils/ProjectUtils";
+import {getCurrentProjectId, getCurrentProjectName} from "../../../../utils/ProjectUtils";
 import {useContext, useEffect, useRef, useState} from "react";
-import {AzureAuthContext} from "../statemanagement/contexts/AzureAuthContext";
+import {AzureAuthContext} from "../../statemanagement/contexts/AzureAuthContext";
 
 import {Button, FormControl, FormControlProps, InputGroup, Modal} from "react-bootstrap";
-import {BLUE} from "../styleConstants";
+import {BLUE} from "../../styleConstants";
 import {
     createRepository, deleteRepository,
     importRepository, isRepositoryEmpty,
     listRepositories
-} from "../../../utils/RepositoryUtils";
+} from "../../../../utils/RepositoryUtils";
 import {BiImport} from "react-icons/all";
-import {AzureAuthConsumer} from "../statemanagement/contexts/AzureAuthContext";
-import {RepositoryImportAlert} from "./messages/alerts";
-import {DeleteConfirmationModal} from "./messages/modals";
-import {RepositoryImportToast} from "./messages/toasts";
-import {RepositoriesContext} from "../statemanagement/contexts/RepositoriesContext";
-import {importBaseContainerRepository, importMainRepository} from "../statemanagement/actions/repositoryAction";
-import {RepositoriesData} from "../statemanagement/types";
+import {AzureAuthConsumer} from "../../statemanagement/contexts/AzureAuthContext";
+import {RepositoryDeleteConfirmationModal} from "../modals/RepositoryDeleteConfirmationModal";
+import {RepositoryImportToast} from "../messages/toasts";
+import {RepositoriesContext} from "../../statemanagement/contexts/RepositoriesContext";
+import {importBaseContainerRepository, importMainRepository} from "../../statemanagement/actions/repositoryAction";
 
 export const ImportRepositoriesStep = () => {
     const [organizationName, setOrganizationName] = useState("");
@@ -137,7 +135,7 @@ export const ImportRepositoriesStep = () => {
                                         setCurrentSourceUrl(baseSrcRef.current.value);
                                         //TODO try to use state currenttarget here
                                         importRepo(baseTargetRef.current.value,
-                                            baseSrcRef.current.value, azureCtx.azureState.azureToken, "base");
+                                            baseSrcRef.current.value, azureCtx.azureState.azureToken, "BASE");
                                     }}><BiImport/></Button>
                         </InputGroup.Append>
                     </InputGroup>
@@ -166,7 +164,7 @@ export const ImportRepositoriesStep = () => {
                         <InputGroup.Append>
                             {/*TODO change mainSrcRef based on checkbox state*/}
                             <Button className="ml-2" variant="outline-primary"
-                                    disabled={mainRepositoryImportSuccess}
+                                    // disabled={mainRepositoryImportSuccess}
                                     onClick={() => {
                                         setCurrentRepoType("MAIN");
                                         setCurrentTargetRepositoryName(getMainRepositoryTargetName());
@@ -180,17 +178,17 @@ export const ImportRepositoriesStep = () => {
                         <RepositoryImportToast show={showBaseRepositoryImportToast}
                                                onClose={() => setShowBaseRepositoryImportToast(false)}
                                                success={baseRepositoryImportSuccess}
-                                               repositoryName={currentTargetRepositoryName}/>
+                                               entityName={currentTargetRepositoryName}/>
                         <RepositoryImportToast show={showMainRepositoryImportToast}
                                                onClose={() => setShowMainRepositoryImportToast(false)}
                                                success={mainRepositoryImportSuccess}
-                                               repositoryName={currentTargetRepositoryName}/>
+                                               entityName={currentTargetRepositoryName}/>
                         {/*<RepositoryImportAlert repositoryName={currentTargetRepositoryName}*/}
                         {/*                       link={buildRepositoryLink(currentTargetRepositoryName)}*/}
                         {/*                       show={baseRepositoryImportSuccess != -1}*/}
                         {/*                       success={baseRepositoryImportSuccess == 1}/>*/}
                     </>
-                    <DeleteConfirmationModal show={deletionConfirmation} onHide={() => {
+                    <RepositoryDeleteConfirmationModal show={deletionConfirmation} onHide={() => {
                         setDeletionConfirmation(false)
                     }} onConfirm={() => {
                         deleteAndImportRepository(azureCtx).then(() => {

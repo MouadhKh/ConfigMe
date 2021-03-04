@@ -74,7 +74,6 @@ export async function getRepositoryByName(repoName: string, azureToken: string) 
         .then((repositories: any[]) => {
             const foundRepo = repositories.filter(repo => repo.name === repoName);
             if (foundRepo.length > 0) {
-                console.log(foundRepo[0]);
                 return foundRepo[0];
             } else {
                 console.log("No repository found with this name " + repoName)
@@ -91,7 +90,6 @@ export async function getRepositoryByName(repoName: string, azureToken: string) 
  */
 export async function copyRepository(targetOrganizationName: string, sourceProjectId: string, targetProjectId: string,
                                      targetRepoName: string, sourceRepositoryId: string, sourceRef: string, targetRef: string) {
-    //POST 
     const url: string = `https://dev.azure.com/${targetOrganizationName}/${targetProjectId}/_apis/git/repositories/${targetRepoName}/forkSyncRequests?api-version=6.0-preview`
     const body = {
         source: {
@@ -155,4 +153,9 @@ export async function isRepositoryEmpty(repositoryName: string, azureToken: stri
     return getRepositoryByName(repositoryName, azureToken).then(repository =>
         repository.size == 0
     );
+}
+
+export async function getRepositoryId(repositoryName: string, azureToken: string) {
+    const repository = await getRepositoryByName(repositoryName, azureToken);
+    return repository.id;
 }

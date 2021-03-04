@@ -1,10 +1,10 @@
 {
   "manifestVersion": 1,
-  "id": "BooksAPIConfig",
+  "id": "ConfigMeExt",
   "publisher": "MouadhKh",
-  "version": "3.7.5",
-  "name": "Extension Books-API Config",
-  "description": "Azure DevOps extension sample",
+  "version": "2.3.1",
+  "name": "ConfigMe",
+  "description": "Project Configuration tool",
   "categories": [
     "Azure Pipelines"
   ],
