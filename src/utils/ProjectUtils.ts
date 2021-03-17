@@ -1,7 +1,7 @@
 import * as SDK from "azure-devops-extension-sdk";
 import {CommonServiceIds, IProjectPageService} from "azure-devops-extension-api";
 import axios from "axios";
-import {AUTH_HEADER, getAuthHeader} from "../auth";
+import { getAuthHeader} from "../auth";
 
 // import {AUTH_HEADER} from "../auth";
 
@@ -39,8 +39,6 @@ export async function listProjectsByOrganization(organizationName: string, token
     let authHeader = getAuthHeader(token);
     const response = axios.get(url, {
             headers: authHeader
-            // 'Authorization': authHeader
-
         }
     );
     console.log("response cors:", response);

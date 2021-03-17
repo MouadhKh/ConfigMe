@@ -21,7 +21,9 @@ export const AuthenticationStep = () => {
             {azureAuthContext => azureAuthContext &&
                 <DockerAuthConsumer>
                     {dockerContext => dockerContext &&
-                        <WizardStepComponent components={[<AzureAuthComponent/>, <DockerAuthComponent azureToken={azureAuthContext.azureState.azureToken}/>]}
+                        <WizardStepComponent components={[<AzureAuthComponent/>,
+                            <DockerAuthComponent azureAuthorized={azureAuthContext.azureState.azureToken !== ""}
+                                                 azureToken={azureAuthContext.azureState.azureToken}/>]}
                                              title="Step 1/5: Authentication"
                                              nextEnabled={azureAuthContext.azureState.azureToken != ""
                                              && isDockerDataNonEmpty(dockerContext.dockerState)}

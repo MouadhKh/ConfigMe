@@ -1,33 +1,37 @@
 import {useEffect, useState} from "react";
-import {FileObject, getDockerFiles} from "../../../utils/ContentUtils";
-import {getBranchNames} from "../../../utils/BranchUtils";
-import {Button, Dropdown} from "react-bootstrap";
+import {FileObject, getDockerFiles} from "../../../../utils/ContentUtils";
+import {getBranchNames} from "../../../../utils/BranchUtils";
+import {Button} from "react-bootstrap";
 import * as React from "react";
-import {BLUE} from "../styleConstants";
+import {BLUE} from "../../styleConstants";
 import {Container} from "react-bootstrap-grid-component/dist/Container";
 import {Row} from "react-bootstrap-grid-component/dist/Row";
 import {Column} from "react-bootstrap-grid-component/dist/Column";
 import {FileRepresentationComponent} from "./FileRepresentationComponent";
 import {AiOutlineFileAdd} from "react-icons/all";
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
+import {EditorComponent} from "../modals/EditorComponent";
+
 
 interface IDockerManagementComponent {
     repositoryName: string,
     azureToken: string
 }
 
-export const DockerManagementComponent = ({repositoryName, azureToken}: IDockerManagementComponent) => {
+export const AdvancedDockerManagementComponent = ({repositoryName, azureToken}: IDockerManagementComponent) => {
     const [selectedBranchName, setSelectedBranchName] = useState("");
     const [branchNames, setBranchNames] = useState([]);
+    const [showEditorCreate, setShowEditorCreate] = useState(false);
     const [files, setFiles]: any = useState([]);
 
     useEffect(() => {
         const isMounted = true;
         if (isMounted) {
-            getDockerFiles(repositoryName, azureToken)
+            getDockerFiles(repositoryName, selectedBranchName, azureToken)
                 .then(response => setFiles(response))
         }
-    }, [])
-
+    }, [selectedBranchName]);
     useEffect(() => {
             //TODO interesting pattern
             const isMounted = true;
@@ -35,6 +39,7 @@ export const DockerManagementComponent = ({repositoryName, azureToken}: IDockerM
                 getBranchNames(repositoryName, azureToken)
                     .then((response) => {
                             setBranchNames(response);
+                            setSelectedBranchName(response[0]);
                         }
                     )
             }
@@ -48,27 +53,18 @@ export const DockerManagementComponent = ({repositoryName, azureToken}: IDockerM
     }
 
     const BranchSelector = ({branchNames}: IBranchSelector) => {
-        const [toggleText, setToggleText] = useState("Select Branch")
         return (
-            //TODO https://react-bootstrap.github.io/components/dropdowns/ (dropdown button instead of toggle)
-            <Dropdown>
-                <Dropdown.Toggle size="sm" variant="outline-primary" id="dropdown-basic">
-                    {toggleText}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    {branchNames.map(name => <Dropdown.Item eventKey={name}
-                                                            onSelect={(event) => {
-                                                                console.log("event:", event);
-                                                                setSelectedBranchName(event!);
-                                                            }} key={name}>{name}</Dropdown.Item>)}
-                </Dropdown.Menu>
-            </Dropdown>
+            <div className="row">
+                <label style={BLUE} className="mr-3">Select a branch </label>
+                <Dropdown options={branchNames} onChange={(option) => {
+                    setSelectedBranchName(option.value)
+                }} value={selectedBranchName} placeholder="Select Branch"/>
+            </div>
         );
     }
     return (
         <div>
-            <h4 style={BLUE}>Dockerfiles : </h4>
-            <Container className="col-10">
+            <Container className="col-10 m-4">
                 <BranchSelector repositoryName={repositoryName}
                                 branchNames={branchNames}
                                 azureToken={azureToken}/>
@@ -76,6 +72,7 @@ export const DockerManagementComponent = ({repositoryName, azureToken}: IDockerM
                     {files.map((file: FileObject) => {
                         return (<Column className="m-3" key={file.objectId}>
                             <FileRepresentationComponent fileObj={file}
+                                                         withButtons={true}
                                                          azureToken={azureToken}
                                                          branchName={selectedBranchName}
                                                          repositoryName={repositoryName}/>
@@ -83,7 +80,12 @@ export const DockerManagementComponent = ({repositoryName, azureToken}: IDockerM
                     })}
                 </Row>
             </Container>
-            <Button className="mt-4" variant="outline-primary"><AiOutlineFileAdd/> Add Dockerfile</Button>
+            <Button className="mt-4" variant="outline-primary" onClick={() => {
+                setShowEditorCreate(true);
+            }}><AiOutlineFileAdd/> Add Dockerfile</Button>
+            <EditorComponent show={showEditorCreate} title="Add Dockerfile" mode="dockerfile" content="" onHide={() =>
+                setShowEditorCreate(false)} type="CREATE" repositoryName={repositoryName}
+                             branchName={selectedBranchName} azureToken={azureToken}/>
         </div>
     );
 }

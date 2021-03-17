@@ -7,10 +7,13 @@ import {useContext, useRef, useState} from "react";
 import {AzureAuthContext, AzureAuthProvider} from "../statemanagement/contexts/AzureAuthContext";
 import {authenticateAzure} from "../statemanagement/actions/authActions";
 import {BLUE} from "../styleConstants";
+import {HelpComponent} from "./HelpComponent";
 // import {AzureAuthContext} from "../contexts/AzureAuthContext";
 
 
-export const AzureAuthComponent = ({}) => {
+const CREATE_PAT_LINK = "https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops&tabs=preview-page";
+
+export const AzureAuthComponent = () => {
 
     const tokenInput: any = useRef(null);//Todo can be problematic
     const [token, setToken] = useState("");
@@ -20,7 +23,7 @@ export const AzureAuthComponent = ({}) => {
         return isTokenValid(token);
     }
 
-    const tokenFeedback = () => {
+    const showFeedback = () => {
         if (authorized)
             return (<h5><Badge variant="success">Success</Badge></h5>);
         return (
@@ -29,16 +32,26 @@ export const AzureAuthComponent = ({}) => {
 
 
     return (
-        // <AzureAuthContext.Provider value={{token: ""}}>
-        <div>
+        <div className="m-3">
             <div className="row">
                 <label className="m-2" style={BLUE}>Azure</label>
                 <SiAzuredevops/>
             </div>
-            <InputGroup size="sm" style={{width: "60%"}} className="mb-3">
+            <InputGroup className="mb-3 w-75">
                 <InputGroup.Prepend>
-                    <InputGroup.Text>Azure Token</InputGroup.Text>
+                    <InputGroup.Text>Azure Token
+                        <HelpComponent id="azToken_tooltip"
+                                       content={
+                                           <div>
+                                               A Tutorial on how to create a personal access token can
+                                               be found <a
+                                               href={CREATE_PAT_LINK} target="_blank"
+                                               rel="noopener noreferrer">here</a>
+                                           </div>}/>
+                    </InputGroup.Text>
+
                 </InputGroup.Prepend>
+
                 <FormControl
                     disabled={authorized}
                     ref={tokenInput}
@@ -60,11 +73,10 @@ export const AzureAuthComponent = ({}) => {
                     }><TiTick color="green"/>
                     </Button>
                     <div className="ml-2">
-                        {token != "" && tokenFeedback()}
+                        {token !== "" && showFeedback()}
                     </div>
                 </InputGroup.Append>
             </InputGroup>
         </div>
-        // </AzureAuthContext.Provider>
     );
 }

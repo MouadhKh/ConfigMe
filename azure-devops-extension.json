@@ -2,8 +2,9 @@
   "manifestVersion": 1,
   "id": "ConfigMeExt",
   "publisher": "MouadhKh",
-  "version": "2.3.1",
+  "version": "5.1.6",
   "name": "ConfigMe",
+
   "description": "Project Configuration tool",
   "categories": [
     "Azure Pipelines"

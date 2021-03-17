@@ -5,26 +5,31 @@ import {getCurrentProjectName} from "./ProjectUtils";
 import {getOrganizationName} from "./OrganizationUtils";
 import {getRepositoryId} from "./RepositoryUtils";
 import {getAuthHeader} from "../auth";
+import axios from "axios";
 
-export async function listDefinitions(projectNameOrId: string, definitionName?: string, repositoryId?: string) {
-    //TODO find a better place for SDK.init()
-    return SDK.init().then(() => {
-            const buildClient: BuildRestClient = getClient(BuildRestClient);
-            const token = SDK.getAccessToken();
-            return token.then(() => buildClient.getDefinitions(projectNameOrId, definitionName, repositoryId));
-        }
-    );
+//TODO rename to get Definition
+export async function listDefinitions(azureToken: string) {
+    const organizationName = await getOrganizationName();
+    const projectName = await getCurrentProjectName();
+    const url = `https://dev.azure.com/${organizationName}/${projectName}/_apis/build/definitions?api-version=6.0`
+    const authHeader = getAuthHeader(azureToken);
+    return axios.get(url, {headers: authHeader}).then(response => {
+        return response.data.value;
+    });
 }
 
-export async function getDefinitionByName(repositoryName: string, definitionName: string, azureToken: string) {
+
+
+export async function getDefinitionByName(definitionName: string, azureToken: string) {
     const projectName = await getCurrentProjectName();
-    const repositoryId = await getRepositoryId(repositoryName, azureToken);
-    const definitions = await listDefinitions(projectName, definitionName, repositoryId);
-    //Strict equality here because getDefinitions() only follow a pattern(TODO investigate more here)
-    const foundDefinitions = definitions.filter((definition: any) => definition.name === definitionName);
-    if (foundDefinitions.length > 0) {
-        console.log("found Definition", foundDefinitions[0]);
-        return foundDefinitions[0];
-    }
-    return "DEFINITION_WITH_THIS_NAME_NOT_FOUND";
+    const organizationName = await getOrganizationName();
+    const url = `https://dev.azure.com/${organizationName}/${projectName}/_apis/build/definitions?name=${definitionName}&api-version=6.0`
+    const authHeader = getAuthHeader(azureToken);
+    return axios.get(url, {headers: authHeader}).then((response: any) => {
+        console.log("response:", response);
+        if (response.data.value.length > 0) {
+            return response.data.value[0];
+        } else
+            return "DEFINITION_NOT_FOUND";
+    });
 }

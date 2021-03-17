@@ -8,11 +8,18 @@ import {useWizard, Wizard} from 'react-use-wizard';
 interface IWizardStepProps {
     components: JSX.Element[],
     title: string,
-    nextEnabled: boolean,
-    nextOnClick: Function
+    nextEnabled?: boolean,
+    nextVisible?: boolean,
+    nextOnClick?: Function
 }
 
-export const WizardStepComponent = (props: IWizardStepProps) => {
+export const WizardStepComponent = ({
+                                        components,
+                                        title,
+                                        nextEnabled = true,
+                                        nextVisible = true,
+                                        nextOnClick
+                                    }: IWizardStepProps) => {
 
     const {handleStep, previousStep, nextStep} = useWizard();
 
@@ -23,35 +30,43 @@ export const WizardStepComponent = (props: IWizardStepProps) => {
             newItem,
             ...arr.slice(index)
         ];
-        let componentsCopy = props.components;
+        let componentsCopy = components;
         for (let i = 0; i < componentsCopy.length; i++) {
             if (i % 2 == 1) {
                 console.log("entered");
                 componentsCopy = insert(componentsCopy, i, <hr
-                    className="mb-4 mt-4 align-items-center w-75"/>);
+                    className="mb-4 mt-4 align-items-center"/>);
             }
         }
         return componentsCopy;
     }
 
-    return (<Card border="primary" className="text-center m-4">
-        <Card.Header>Project Configuration Wizard <GrConfigure/></Card.Header>
-        <Card.Body>
-            <Card.Title>{props.title}</Card.Title>
-            <Card.Body>
-                {insertSeparation().map((component, i) => {
-                    return <div key={i}>{component}</div>;
-                })}
-                <Button className="float-right" variant="outline-primary"
-                        disabled={!props.nextEnabled}
-                        onClick={() => {
-                            props.nextOnClick()
-                            nextStep().then(() => console.log("next step clicked"));
-                        }}>Next <FcNext/></Button>
-            </Card.Body>
-        </Card.Body>
-        <Card.Footer className="text-muted"><AiFillCopyrightCircle/> Mouadh Khlifi
-            2021</Card.Footer>
-    </Card>);
-
+    return (
+        <div
+            // style={{height:'100%',width:'800px'}}
+        >
+            <Card border="dark" className="text-center">
+                <Card.Header style={{backgroundColor: "#72A1E5"}}><i>Project
+                    Configuration Wizard</i> <GrConfigure/></Card.Header>
+                <Card.Body>
+                    <Card.Title className="mb-4">{title}</Card.Title>
+                    <div>
+                        {insertSeparation().map((component, i) => {
+                            return <div className="w-100" key={i}>{component}</div>;
+                        })}
+                    </div>
+                    {nextVisible && <Button className="float-right mt-3" variant="outline-primary"
+                                            disabled={!nextEnabled}
+                                            onClick={() => {
+                                                if (nextOnClick) {
+                                                    nextOnClick();
+                                                }
+                                                nextStep().then(() => console.log("Actual Step:", title));
+                                            }}>Next <FcNext/></Button>}
+                </Card.Body>
+                <Card.Footer className="text-muted"><AiFillCopyrightCircle/> Mouadh Khlifi
+                    2021</Card.Footer>
+            </Card>
+        </div>
+    );
 }

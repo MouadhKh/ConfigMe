@@ -4,22 +4,23 @@ import "./ConfigWizard.css";
 import {Page} from "azure-devops-ui/Page";
 import * as SDK from "azure-devops-extension-sdk";
 import {showRootComponent} from "../../Common";
-import {AzureAuthComponent} from "./components/AzureAuthComponent";
-import {DockerAuthComponent} from "./components/DockerAuthComponent";
 import {WizardStepComponent} from "./components/stepComponents/WizardStepComponent";
-import {useContext, useEffect, useState} from "react";
+import {useEffect} from "react";
 import {Wizard} from "react-use-wizard";
-import {debugContextDevtool} from "react-context-devtool";
+import {ContextDevTool, debugContextDevtool} from "react-context-devtool";
 import {
     DockerAuthProvider
 } from "./statemanagement/contexts/DockerAuthContext";
 import {AuthenticationStep} from "./components/stepComponents/AuthenticationStep";
 import {AzureAuthProvider} from "./statemanagement/contexts/AzureAuthContext";
 import {ImportRepositoriesStep} from "./components/stepComponents/ImportRepositoriesStep";
-import {RepositoriesProvider} from "./statemanagement/contexts/RepositoriesContext";
+import {RepositoriesContext, RepositoriesProvider} from "./statemanagement/contexts/RepositoriesContext";
 import {ManagePipelineStep} from "./components/stepComponents/ManagePipelineStep";
-import {TestStep} from "./components/stepComponents/TestStep";
+// import {TestStep} from "./components/stepComponents/TestStep";
 import {ManageDockerStep} from "./components/stepComponents/ManageDockerStep";
+import {TestStep} from "./components/stepComponents/TestStep";
+import {ModeProvider} from "./statemanagement/contexts/ModeContext";
+import {CreatePipelinesStep} from "./components/stepComponents/CreatePipelinesStep";
 
 //TODO maybe use this for config parameters
 //TODO first page in the wizard should be the authenticator(generate token + docker logins)
@@ -35,35 +36,38 @@ export const ConfigWizard = () => {
         await SDK.ready();
     }
     return (
-        <Page className="flex-grow flex-center">
-            <AzureAuthProvider>
-                <DockerAuthProvider>
-                    <RepositoriesProvider>
-                        <div className="container">
-                            <div className="col-10 mx-auto">
-                                <Wizard>
-                                    <TestStep/>
-                                    {/*<WizardStepComponent components={[<TestStep/>]} title={"TestStep"}*/}
-                                    {/*                     nextEnabled={false} nextOnClick={() => console.log("test")}/>*/}
-                                    {/*<AuthenticationStep/>*/}
-                                    {/*<WizardStepComponent components={[<ImportRepositoriesStep/>]}*/}
-                                    {/*                     title="Step 2/5: Import Repositories"*/}
-                                    {/*                     nextEnabled={true} nextOnClick={() => console.log("next(2)")}/>*/}
-                                    {/*<WizardStepComponent components={[<ManagePipelineStep/>]}*/}
-                                    {/*                     title={"Step 3/5: Manage Pipelines"}*/}
-                                    {/*                     nextEnabled={true} nextOnClick={() => console.log("hi")}/>*/}
-                                    {/*<WizardStepComponent components={[<ManageDockerStep/>]}*/}
-                                    {/*                     title={"Step 4/5: Manage Dockerfiles"}*/}
-                                    {/*                     nextEnabled={true} nextOnClick={() => console.log("hi")}/>*/}
-
-                                    {/*<WizardStepComponent components={[<AzureAuthComponent/>]} title="Step 2"*/}
-                                    {/*                     nextOnClick={() => console.log("step 2")} nextEnabled={false}/>*/}
-                                </Wizard>
+        <Page className="page-content m-5">
+            {/*<Page className="flex-grow flex-center">*/}
+            <ModeProvider>
+                <AzureAuthProvider>
+                    <DockerAuthProvider>
+                        <RepositoriesProvider>
+                            <div>
+                                <ContextDevTool context={RepositoriesContext} id="repositoriesCtx"
+                                                displayName="Repositories Context"/>
+                                <div style={{width: '100%'}} className="container">
+                                    <Wizard>
+                                        <AuthenticationStep/>
+                                        <ImportRepositoriesStep/>
+                                        <WizardStepComponent components={[<ManagePipelineStep/>]}
+                                                             title={"Step 3/5: Manage Pipelines"}
+                                        />
+                                        <WizardStepComponent components={[<ManageDockerStep/>]}
+                                                             title={"Step 4/5: Manage Dockerfiles"}
+                                        />
+                                        <WizardStepComponent components={[<CreatePipelinesStep/>]}
+                                                             title="Step 5/5: Create pipelines"
+                                                             nextVisible={false}
+                                        />
+                                        {/*<WizardStepComponent components={[<AzureAuthComponent/>]} title="Step 2"*/}
+                                        {/*                     nextOnClick={() => console.log("step 2")} nextEnabled={false}/>*/}
+                                    </Wizard>
+                                </div>
                             </div>
-                        </div>
-                    </RepositoriesProvider>
-                </DockerAuthProvider>
-            </AzureAuthProvider>
+                        </RepositoriesProvider>
+                    </DockerAuthProvider>
+                </AzureAuthProvider>
+            </ModeProvider>
         </Page>
     );
 

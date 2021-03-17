@@ -1,23 +1,27 @@
-import {ReactPropTypes, useEffect, useState} from "react";
+import {useState} from "react";
 import * as React from 'react';
 import {GrEdit, IoLogoDocker, MdDelete, SiAzurepipelines} from "react-icons/all";
-import {deleteFile, extractFileName, FileObject, getFileData, pushFile, updateFile} from "../../../utils/ContentUtils";
+import {
+    deleteFile,
+    extractFileName,
+    FileObject,
+    getFileData,
+} from "../../../../utils/ContentUtils";
 import {Button, ButtonGroup} from "react-bootstrap";
-import {EditorComponent} from "./modals/EditorComponent";
+import {EditorComponent} from "../modals/EditorComponent";
 
 // import dockerIcon from '../../../../../static/dockerIcon.png';
 
 interface IFileRepresentation {
     fileObj: FileObject
     repositoryName: string,
+    withButtons: boolean,
     azureToken: string
     branchName: string
 }
 
-//https://react-bootstrap.github.io/components/list-group/
 interface IFileIconProps {
     type: string
-
 }
 
 const FileIcon = ({type}: IFileIconProps) => {
@@ -41,7 +45,7 @@ const getMode = (fileObj: FileObject) => {
 }
 
 export const FileRepresentationComponent = ({
-                                                fileObj, repositoryName,
+                                                fileObj, repositoryName, withButtons,
                                                 azureToken,
                                                 branchName
                                             }: IFileRepresentation) => {
@@ -55,26 +59,28 @@ export const FileRepresentationComponent = ({
     const onEdit = async (repositoryName: string, fileObj: FileObject, azureToken: string) => {
         const fileData = await getFileData(repositoryName, fileObj, azureToken);
         setFileContent(fileData);
-        console.log("fileData", fileData)
     }
 
 
     return (<div className="row">
-        <div className="mr-2 col-2">
             <FileIcon type={getFileType(fileObj)}/>
+            <b className="mr-2"><i>{extractFileName(fileObj.path)}</i></b>
+            {withButtons &&
+            <div>
+                <ButtonGroup>
+                    <Button onClick={() => {
+                        onEdit(repositoryName, fileObj, azureToken);
+                        setShowEditor(true);
+                    }} size="sm" variant="outline-primary"><GrEdit/></Button>
+                    <Button onClick={() => onDelete(fileObj, repositoryName, branchName, azureToken)} size="sm"
+                            variant="outline-danger"><MdDelete/></Button>
+                </ButtonGroup>
+                <EditorComponent show={showEditor} content={fileContent} onHide={() => setShowEditor(false)}
+                                 type="EDIT" title={`${getFileType(fileObj)} Editor`} mode={getMode(fileObj)}
+                                 repositoryName={repositoryName}
+                                 fileObj={fileObj} branchName={branchName} azureToken={azureToken}/>
+
+            </div>}
         </div>
-        <b className="mr-2"><i>{extractFileName(fileObj.path)}</i></b>
-        <ButtonGroup>
-            <Button onClick={() => {
-                onEdit(repositoryName, fileObj, azureToken);
-                setShowEditor(true);
-            }} size="sm" variant="outline-primary"><GrEdit/></Button>
-            <Button onClick={() => onDelete(fileObj, repositoryName, branchName, azureToken)} size="sm"
-                    variant="outline-danger"><MdDelete/></Button>
-        </ButtonGroup>
-        <EditorComponent show={showEditor} content={fileContent} onHide={() => setShowEditor(false)}
-                         type="EDIT" title={`${getFileType(fileObj)} Editor`} mode={getMode(fileObj)}
-                         repositoryName={repositoryName}
-                         fileObj={fileObj} branchName={branchName} azureToken={azureToken}/>
-    </div>);
+    );
 }

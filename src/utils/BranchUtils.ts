@@ -1,13 +1,14 @@
-import {AUTH_HEADER, getAuthHeader} from "../auth";
+import {getAuthHeader} from "../auth";
 import axios from "axios";
 import {getOrganizationName} from "./OrganizationUtils";
 import {getRepositoryId} from "./RepositoryUtils";
 import {getCurrentProjectName} from "./ProjectUtils";
 import {extractFileName} from "./ContentUtils";
 
-export async function listBranches(organizationName: string, projectIdOrName: string) {
+export async function listBranches(organizationName: string, projectIdOrName: string, azureToken: string) {
+    const authHeader = getAuthHeader(azureToken);
     const url = `https://dev.azure.com/{organization}/${projectIdOrName}/_apis/tfvc/branches?path=$/&api-version=6.0`
-    return axios.get(url, {headers: AUTH_HEADER}).then((response) => {
+    return axios.get(url, {headers: authHeader}).then((response) => {
         console.log(response.data);
         return response.data;
     });
@@ -22,10 +23,13 @@ export async function listBranches(organizationName: string, projectIdOrName: st
  * @param branchName : branch to create
  * @param comment : commit comment
  * @param content : README Content
+ * @param azureToken
  */
-export async function createBranch(organizationName: string, repositoryId: string, branchName: string, comment: string, content: string, sourceBranchId?: string) {
+export async function createBranch(organizationName: string, repositoryId: string, branchName: string,
+                                   comment: string, content: string, azureToken: string, sourceBranchId?: string,) {
     const url = `https://dev.azure.com/${organizationName}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`;
     sourceBranchId = (typeof sourceBranchId !== "undefined") ? sourceBranchId : "0000000000000000000000000000000000000000";
+    const authHeader = getAuthHeader(azureToken)
     const body = {
         refUpdates: [
             {
@@ -51,7 +55,7 @@ export async function createBranch(organizationName: string, repositoryId: strin
             }
         ]
     }
-    const response = axios.post(url, body, {headers: AUTH_HEADER});
+    const response = axios.post(url, body, {headers: authHeader});
     return response.then((res) => {
         console.log(`Branch ${branchName} created successfully`)
         return res.data;
@@ -70,10 +74,9 @@ export async function getRefs(repositoryName: string, azureToken: string) {
 
 /**
  * Used to get the optional parameter in #createBranch()
- * @param organizationName
- * @param projectIdOrName
- * @param repositoryId
+ * @param repositoryName
  * @param refName
+ * @param azureToken
  */
 export async function getRefObjectId(repositoryName: string, refName: string, azureToken: string) {
     const projectName = await getCurrentProjectName();

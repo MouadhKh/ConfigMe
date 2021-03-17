@@ -2,20 +2,12 @@
 //import { GitRestClient } from "azure-devops-extension-api/Git";
 //import * as SDK from "azure-devops-extension-sdk";
 import axios from 'axios';
-import {AUTH_HEADER, getAuthHeader} from "../auth";
 import {getOrganizationName} from "./OrganizationUtils";
 import {getCurrentProjectName} from "./ProjectUtils";
+import {getAuthHeader} from "../auth";
 
 const ENDPOINT = "https://dev.azure.com/ORG_NAME/PROJECT_NAME/_apis/git/repositories?api-version=6.0";
 
-/**
- * create multiple repositories on currentProject
- * @param url
- * @param repositoriesNames
- */
-export async function createRepositories(organizationName: string, projectName: string, repositoriesNames: string[], azureToken: string) {
-    return axios.all(repositoriesNames.map((repoName) => createRepository(organizationName, projectName, repoName, azureToken)));
-}
 
 /**
  * Create Repository on CURRENT project
@@ -29,6 +21,7 @@ export async function createRepositories(organizationName: string, projectName: 
 export async function createRepository(organizationName: string, projectId: string, repoName: string, azureToken: string, skip: boolean = false) {
     //TODO delete the if
     if (skip) {
+        console.log("exists:", repoName)
         return getRepositoryByName(repoName, azureToken);
     }
     let body = {
@@ -89,8 +82,9 @@ export async function getRepositoryByName(repoName: string, azureToken: string) 
  * targetRef : The target ref to update. For example, refs/heads/master.
  */
 export async function copyRepository(targetOrganizationName: string, sourceProjectId: string, targetProjectId: string,
-                                     targetRepoName: string, sourceRepositoryId: string, sourceRef: string, targetRef: string) {
+                                     targetRepoName: string, sourceRepositoryId: string, sourceRef: string, targetRef: string, azureToken: string) {
     const url: string = `https://dev.azure.com/${targetOrganizationName}/${targetProjectId}/_apis/git/repositories/${targetRepoName}/forkSyncRequests?api-version=6.0-preview`
+    const authHeader = getAuthHeader(azureToken);
     const body = {
         source: {
             projectId: sourceProjectId,
@@ -102,13 +96,10 @@ export async function copyRepository(targetOrganizationName: string, sourceProje
         }
     }
 
-    return axios.post(url, body, {headers: AUTH_HEADER}).then((response) => {
-        console.log("repo copied successfully:", response);
+    return axios.post(url, body, {headers: authHeader}).then((response) => {
         return response;
     }).catch((err) => {
-        console.log("error copying repository", err)
-        console.log("copy body: ", body);
-
+        console.log("Error:", err);
     });
 }
 

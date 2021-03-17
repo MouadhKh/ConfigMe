@@ -12,14 +12,14 @@ import {getLastCommit} from "./CommitsUtils";
 //     const gitClient: GitRestClient = await getClient(GitRestClient);
 //     return gitClient.getItems(repositoryId, projectName, "/", VersionControlRecursionType.Full);
 // }
-export async function getAllFiles(repositoryName: string, includeContent: boolean, azureToken: string) {
+export async function getAllFiles(repositoryName: string, branchName: string, azureToken: string) {
     const projectName = await getCurrentProjectName();
     const organizationName = await getOrganizationName();
     const repositoryId = await getRepositoryId(repositoryName, azureToken);
     const authHeader = getAuthHeader(azureToken);
-    const url = `https://dev.azure.com/${organizationName}/${projectName}/_apis/git/repositories/${repositoryId}/items?recursionLevel=120&includeContent=${includeContent}&api-version=6.0`;
+    const url = `https://dev.azure.com/${organizationName}/${projectName}/_apis/git/repositories/${repositoryId}/items?recursionLevel=120&versionDescriptor.version=${branchName}&api-version=6.0`;
+    // const url = `https://dev.azure.com/${organizationName}/${projectName}/_apis/git/repositories/${repositoryId}/items?recursionLevel=120&includeContent=${includeContent}&api-version=6.0`;
     return axios.get(url, {headers: authHeader}).then((response) => {
-        console.log("response", response);
         return response.data.value
     });
 }
@@ -33,14 +33,14 @@ export type FileObject = {
     url: string
 }
 
-export async function getPipelineFiles(repositoryName: string, azureToken: string) {
-    const files: any[] = await getAllFiles(repositoryName, true, azureToken);
+export async function getPipelineFiles(repositoryName: string, branchName: string, azureToken: string) {
+    const files: any[] = await getAllFiles(repositoryName, branchName, azureToken);
     return files.filter(fileObj => fileObj.path.includes(".yml")
     );
 }
 
-export async function getDockerFiles(repositoryName: string, azureToken: string) {
-    const files: any[] = await getAllFiles(repositoryName, true, azureToken);
+export async function getDockerFiles(repositoryName: string, branchName: string, azureToken: string) {
+    const files: any[] = await getAllFiles(repositoryName, branchName, azureToken);
     return files.filter(fileObj => fileObj.gitObjectType === "blob" && fileObj.path.includes("Dockerfile"));
 }
 
@@ -59,20 +59,23 @@ export async function getFileData(repositoryName: string, fileObj: FileObject, a
     ${repositoryId}/blobs/${sha1}?$format=text&api-version=6.0`;
     const authHeader = getAuthHeader(azureToken);
     return axios.get(url, {headers: authHeader}).then((response) => {
-        console.log("fileData response", response)
         return response.data;
     });
 }
 
+/**
+ * returns status code
+ * @param fileObj
+ * @param repositoryName
+ * @param branchName
+ * @param content
+ * @param azureToken
+ */
 export async function updateFile(fileObj: FileObject, repositoryName: string, branchName: string, content: string, azureToken: string) {
     const organizationName = await getOrganizationName();
     const repositoryId = await getRepositoryId(repositoryName, azureToken);
-    const projectName = await getCurrentProjectName();
     const authHeader = getAuthHeader(azureToken);
     const comment = `updated ${extractFileName(fileObj.path)}`;
-    console.log("fileObj", fileObj);
-    console.log("commitId", fileObj.commitId);
-    console.log("branchName", branchName);
     const url = `https://dev.azure.com/${organizationName}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`;
     // const url = `https://dev.azure.com/${organizationName}/${projectName}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`;
     // const sourceBranchId=getRefObjectId(organizationName,projectName,repositoryId,fileObj,azureToken)
@@ -102,8 +105,72 @@ export async function updateFile(fileObj: FileObject, repositoryName: string, br
         ]
     }
     return axios.post(url, body, {headers: authHeader})
-        .then((response) => console.log("update:", response))
-        .catch((err) => console.log("error:", err));
+        .then((response) => {
+            return response.status;
+
+        })
+        .catch((err) => {
+            console.log("error:", err);
+            return err;
+        });
+}
+
+function buildCommentForMultipleFiles(files: FileObject[], verb: string) {
+    return verb + " " + files.map(file => extractFileName(file.path)).join(",");
+}
+
+/**
+ * Use this function carefully since files & contents need to match
+ * @param files
+ * @param contents
+ * @param changeType
+ */
+function buildChangesForMultipleFiles(files: FileObject[], contents: string[], changeType: string) {
+    let changes = [];
+    for (let i = 0; i < files.length; i++) {
+        changes.push({
+            changeType: changeType,
+            item: {
+                path: files[i].path
+            },
+            newContent: {
+                content: contents[i],
+                contentType: "rawtext"
+            }
+        });
+    }
+    return changes;
+}
+
+export async function updateFiles(files: FileObject[], repositoryName: string, branchName: string, contents: string[], azureToken: string) {
+    const organizationName = await getOrganizationName();
+    const repositoryId = await getRepositoryId(repositoryName, azureToken);
+    const authHeader = getAuthHeader(azureToken);
+    const comment = buildCommentForMultipleFiles(files, "updated");
+    const url = `https://dev.azure.com/${organizationName}/_apis/git/repositories/${repositoryId}/pushes?api-version=6.0`;
+    const body = {
+        refUpdates: [
+            {
+                name: `refs/heads/${branchName}`,
+                oldObjectId: files[0].commitId
+            }
+        ],
+        commits: [
+            {
+                comment: comment,
+                changes: buildChangesForMultipleFiles(files, contents, "edit")
+            }
+        ]
+    }
+    return axios.post(url, body, {headers: authHeader})
+        .then((response) => {
+            return response.status;
+
+        })
+        .catch((err) => {
+            console.log("error:", err);
+            return err;
+        });
 }
 
 export async function pushFile(repositoryName: string, branchName: string, path: string, content: string, azureToken: string) {
@@ -142,7 +209,9 @@ export async function pushFile(repositoryName: string, branchName: string, path:
             }
         ]
     }
-    return axios.post(url, body, {headers: authHeader}).then((response) => console.log("update:", response));
+    return axios.post(url, body, {headers: authHeader})
+        .then((response) => response.status)
+        .catch((err => console.log("Error pushing the file:", err)));
 }
 
 export async function deleteFile(repositoryName: string, branchName: string, fileObj: FileObject, azureToken: string) {

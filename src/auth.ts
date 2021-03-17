@@ -2,7 +2,8 @@
 //TODO: problem of this approach is that myPAT is needed (hide secret)
 //const myPATToken = ':3bm3hcokqz5ackq4fadsn3eqf22gjjjsrspfytk5xk7zetrr447q';
 import {getOrganizationName} from "./utils/OrganizationUtils";
-import {listProjectsByOrganization} from "./utils/ProjectUtils";
+import {getProjectByName, listProjectsByOrganization} from "./utils/ProjectUtils";
+import {listRepositories} from "./utils/RepositoryUtils";
 
 export function getAuthHeader(patToken: string) {
     return {Authorization: 'Basic ' + btoa(":" + patToken)}
@@ -15,6 +16,3 @@ export async function isTokenValid(token: string) {
     let status: number = await response.then((res) => res.status);
     return status == 200;
 }
-export const AUTH_HEADER = {
-    'Authorization': 'Basic ' + btoa(":3bm3hcokqz5ackq4fadsn3eqf22gjjjsrspfytk5xk7zetrr447q")
-};

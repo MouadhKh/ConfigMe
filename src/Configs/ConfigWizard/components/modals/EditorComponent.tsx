@@ -1,15 +1,17 @@
-import {Button, FormControl, InputGroup, Modal} from "react-bootstrap";
+import {Button, Form, FormControl, InputGroup, Modal} from "react-bootstrap";
 import * as React from "react";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/mode-yaml";
 import "ace-builds/src-noconflict/mode-dockerfile";
-// import "react-ace-builds/webpack-resolver-min";
 import {useEffect, useRef, useState} from "react";
 import {extractFileName, FileObject, pushFile, updateFile} from "../../../../utils/ContentUtils";
-import {edit} from "ace-builds";
 import {FaRegSave} from "react-icons/all";
-import {FilePushToast, RepositoryImportToast} from "../messages/toasts";
+import "react-toastify/dist/ReactToastify.css";
+import {toastOptions} from "../messages/toasts";
+import {toast, ToastContainer} from "react-toastify";
+import {BLUE} from "../../styleConstants";
+
 
 interface IPipelineEditor {
     show: boolean,
@@ -18,7 +20,7 @@ interface IPipelineEditor {
     content: string,
     onHide: any,
     type: string,
-    fileObj: FileObject,
+    fileObj?: FileObject,
     repositoryName: string,
     branchName: string,
     azureToken: string
@@ -31,20 +33,24 @@ interface IRenderPath {
 
 const PathComponent = ({type, refObject}: IRenderPath) => {
     if (type === "CREATE") {
-        return <InputGroup>
-            <InputGroup.Prepend>
-                <InputGroup.Text>PPath</InputGroup.Text>
-            </InputGroup.Prepend>
-            <FormControl
-                ref={refObject}
-                placeholder="Path"
-                aria-label="Path"
-                aria-describedby="Path"
-            />
-        </InputGroup>
+        return (
+            <div>
+                <InputGroup hasValidation>
+                    <InputGroup.Prepend>
+                        <InputGroup.Text>Path </InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <Form.Control type="text" required
+                                  ref={refObject}
+                                  placeholder="Path"
+                                  aria-label="Path"
+                                  aria-describedby="Path"
+                    />
+                    <Form.Text className="text-muted"><i style={BLUE}> Make
+                        sure the given path exists.</i></Form.Text>
+                </InputGroup>
+            </div>);
     }
     return <></>;
-
 }
 //TODO solve problem with onSave when creating
 export const EditorComponent = ({
@@ -59,69 +65,77 @@ export const EditorComponent = ({
                                     branchName,
                                     azureToken
                                 }: IPipelineEditor) => {
-
-
     const pathRef: any = useRef(null);
     const editorRef: any = useRef(null);
     const editorValue = useState("");
-    const [operationSuccess, setOperationSuccess] = useState(false);
-    const [showOperationToast, setShowOperationToast] = useState(false);
-    //TODO feedback missing
-    const saveFile = () => {
-        if (type === "EDIT") {
-            updateFile(fileObj, repositoryName, branchName, editorValue[0], azureToken).then((response: any) => {
-                if (response.status == 200)
-                    setOperationSuccess(true);
-            });
-        } else if (type === "ADD") {
-            pushFile(repositoryName, branchName, pathRef.current.value, editorValue[0], azureToken).then((response: any) => {
-                if (response.status == 200)
-                    setOperationSuccess(true);
-            });
+    const showFeedBack = (saveFileResult: boolean, path: string) => {
+        if (saveFileResult) {
+            const Message = () => (<div>pushed <b>{extractFileName(path)}</b> successfully</div>);
+            toast.success(
+                <Message/>, {...toastOptions, toastId: '201'});
+        } else {
+            const Message = () => (<div>An Error occured while pushing <b>{extractFileName(path)} </b></div>);
+            toast.error(<Message/>, ({...toastOptions, toastId: '409'}))
         }
     }
-    return (<Modal size="lg" centered show={show} onHide={onHide}>
-        <Modal.Header closeButton>
-            <Modal.Title>{title}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-            <div className="offset-3">
-                <AceEditor
-                    ref={editorRef}
-                    width="80%"
-                    mode={mode}
-                    theme="github"
-                    name="Editor"
-                    fontSize={14}
-                    onChange={(value) => editorValue[0] = value}
-                    showPrintMargin={true}
-                    showGutter={true}
-                    highlightActiveLine={true}
-                    value={content}
-                    setOptions={{
-                        enableBasicAutocompletion: false,
-                        enableLiveAutocompletion: false,
-                        enableSnippets: false,
-                        showLineNumbers: true,
-                        tabSize: 2,
-                    }}/>
-            </div>
+    const saveFile = async () => {
+        if (type === "EDIT") {
+            const status = await updateFile(fileObj!, repositoryName, branchName, editorValue[0], azureToken)
+            return status == 201
+        } else if (type === "CREATE") {
 
-        </Modal.Body>
+            const status = await pushFile(repositoryName, branchName, pathRef.current.value, editorValue[0], azureToken);
+            return status == 201;
+        }
+        return false;
+    }
 
-        <Modal.Footer>
-            <PathComponent type={type} refObject={pathRef}/>
-            <Button variant="outline-primary" onClick={() => {
-                saveFile()
-                setShowOperationToast(true);
-                onHide;
+    function getPath() {
+        return fileObj === undefined ? pathRef.current.value : fileObj!.path;
+    }
 
-            }}><FaRegSave/> Save</Button>
-        </Modal.Footer>
+    return (
+        <div>
+            <Modal size="lg" centered show={show} onHide={onHide}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{title}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="offset-3">
+                        <AceEditor
+                            ref={editorRef}
+                            width="80%"
+                            mode={mode}
+                            theme="github"
+                            name="Editor"
+                            fontSize={14}
+                            onChange={(value) => editorValue[0] = value}
+                            showPrintMargin={true}
+                            showGutter={true}
+                            highlightActiveLine={true}
+                            value={content}
+                            setOptions={{
+                                enableBasicAutocompletion: false,
+                                enableLiveAutocompletion: false,
+                                enableSnippets: false,
+                                showLineNumbers: true,
+                                tabSize: 2,
+                            }}/>
+                    </div>
 
-        <FilePushToast show={showOperationToast}
-                       onClose={() => setShowOperationToast(false)}
-                       success={operationSuccess}
-                       entityName={extractFileName(fileObj.path)}/>
-    </Modal>);
+                </Modal.Body>
+                <Modal.Footer>
+                    <div className="row">
+                        <PathComponent type={type} refObject={pathRef}/>
+                        <Button variant="outline-primary" onClick={async () => {
+                            const save = await saveFile()
+                            showFeedBack(save, getPath());
+                            onHide();
+                        }}><FaRegSave/> Save</Button>
+                    </div>
+                </Modal.Footer>
+            </Modal>
+            <ToastContainer/>
+        </div>
+    );
 }

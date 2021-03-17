@@ -1,26 +1,29 @@
-import * as SDK from "azure-devops-extension-sdk";
-import {getClient} from "azure-devops-extension-api";
-import {ServiceEndpoint, ServiceEndpointRestClient} from "azure-devops-extension-api/ServiceEndpoint";
 import {getAuthHeader} from "../auth";
 import axios from "axios";
-import {azureAuthReducer} from "../Configs/ConfigWizard/statemanagement/reducers/authReducer";
 import {getOrganizationName} from "./OrganizationUtils";
-import {getRepositoryId} from "./RepositoryUtils";
 import {getCurrentProjectId, getCurrentProjectName} from "./ProjectUtils";
 
-// TODO refactor sdk variant
-// export async function createServiceEndpointWithSDK(projectNameOrId: string, definitionName?: string, repositoryId?: string) {
-//     //TODO find a better place for SDK.init()
-//     return SDK.init().then(() => {
-//             const serviceEndpointClient: ServiceEndpointRestClient = getClient(ServiceEndpointRestClient);
-//             const token = SDK.getAccessToken();
-//             // return token.then(() => serviceEndpointClient.createServiceEndpoint({}, projectNameOrId));
-//         }
-//     );
-// }
+
+export async function listServiceEndpoints(azureToken: string) {
+    const organizationName = await getOrganizationName();
+    const projectName = await getCurrentProjectName();
+    const url = `https://dev.azure.com/${organizationName}/${projectName}/_apis/serviceendpoint/endpoints?api-version=6.0-preview.4`
+    const authHeader = getAuthHeader(azureToken)
+    return axios.get(url, {headers: authHeader}).then(response => response.data.value);
+}
+
+export async function getServiceEndpointByName(serviceEndpointName: string, azureToken: string) {
+    const serviceEndpoints = await listServiceEndpoints(azureToken);
+    return serviceEndpoints.filter((endpoint: any) => endpoint.name === serviceEndpointName)[0];
+}
+
+export async function getServiceEndpointId(serviceEndpointName: string, azureToken: string) {
+    const serviceEndpoint: any = await getServiceEndpointByName(serviceEndpointName, azureToken);
+    return serviceEndpoint.id;
+
+}
 
 export async function createDockerRegistry(azureToken: string, dockerRegistryName: string, username: string, password: string) {
-
     const organizationName = await getOrganizationName();
     const projectName = await getCurrentProjectName();
     const projectId = await getCurrentProjectId();
@@ -44,7 +47,6 @@ export async function createDockerRegistry(azureToken: string, dockerRegistryNam
         },
         isShared: false,
         isReady: true,
-        //can customize this more
         serviceEndpointProjectReferences: [
             {
                 projectReference: {
@@ -55,5 +57,5 @@ export async function createDockerRegistry(azureToken: string, dockerRegistryNam
             }
         ]
     }
-    return axios.post(url, body, {headers: authHeader}).then(() => console.log("docker registry created successfully"))
+    return axios.post(url, body, {headers: authHeader}).then((response: any) => response.status);
 }
