@@ -1,15 +1,16 @@
 import * as SDK from "azure-devops-extension-sdk";
-import { CommonServiceIds, IProjectPageService } from "azure-devops-extension-api";
+import {CommonServiceIds, IProjectPageService} from "azure-devops-extension-api";
 import axios from "axios";
-import { AUTH_HEADER } from "../auth";
+import {getAuthHeader} from "./auth";
+
+// import {AUTH_HEADER} from "../auth";
 
 /**
-   * When SDK is used the project Name in the current page get fetched
+ * When SDK is used the project Name in the current page get fetched
  */
-export async function getCurrentProjectId(): Promise<string> {
+export async function getCurrentProjectId() {
     let projectService = await SDK.getService<IProjectPageService>(CommonServiceIds.ProjectPageService);
     let res = await projectService.getProject().then((response) => {
-        console.log("project id: " + response?.id);
         return response?.id;
     }).catch((err) => console.log("Error Retrieving Project Id: " + err));
     if (res != undefined) {
@@ -33,20 +34,36 @@ export async function getCurrentProjectName(): Promise<string> {
     return "INVALID_GET_PROJECT_NAME";//supposed to be an error code
 }
 
-export async function listProjectsByOrganization(organizationName: string) {
+/**
+ * Fetch all projects
+ * @param organizationName
+ * @param azureToken
+ */
+export async function listProjectsByOrganization(organizationName: string, azureToken: string) {
     const url = `https://dev.azure.com/${organizationName}/_apis/projects?api-version=6.0`
-    return axios.get(url, { headers: AUTH_HEADER });
+    let authHeader = getAuthHeader(azureToken);
+    const response = axios.get(url, {
+            headers: authHeader
+        }
+    );
+    console.log("response cors:", response);
+    return response;
 }
 
-export async function getProjectByName(organizationName: string, projectName: string) {
+/**
+ * fetch project by name
+ * @param organizationName
+ * @param projectName
+ * @param token
+ */
+export async function getProjectByName(organizationName: string, projectName: string, token: string) {
     //bad: can cause problems
-    let foundProjects = await (await listProjectsByOrganization(organizationName)).data.value.filter((project: any) =>
+    let foundProjects = await (await listProjectsByOrganization(organizationName, token)).data.value.filter((project: any) =>
         project.name === projectName);
     if (foundProjects.length > 0) {
         console.log("project found " + foundProjects[0]);
         return foundProjects[0];
-    }
-    else {
+    } else {
         console.log(`No project called ${projectName} found`)
     }
 }
