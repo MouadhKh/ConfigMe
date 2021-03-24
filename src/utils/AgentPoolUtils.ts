@@ -1,9 +1,9 @@
 import {getOrganizationName} from "./OrganizationUtils";
 import {getCurrentProjectName} from "./ProjectUtils";
-import {getAuthHeader} from "../auth";
+import {getAuthHeader} from "./auth";
 import axios from "axios";
 
-//TODO try here to use the decorators
+
 export async function listAgentPools(azureToken: string) {
     const organizationName = await getOrganizationName();
     const projectName = await getCurrentProjectName()

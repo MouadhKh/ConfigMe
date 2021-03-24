@@ -1,5 +1,5 @@
 import axios from "axios";
-import {getAuthHeader} from "../../auth";
+import {getAuthHeader} from "../auth";
 
 export async function authenticate(username: string, password: string) {
     const url = `https://auth.docker.io/token?service=registry-2.docker.io`;

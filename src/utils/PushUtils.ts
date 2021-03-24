@@ -1,10 +1,8 @@
 import {getOrganizationName} from "./OrganizationUtils";
 import {getCurrentProjectName} from "./ProjectUtils";
-import {getClient} from "azure-devops-extension-api";
-import {GitRestClient, VersionControlRecursionType} from "azure-devops-extension-api/Git";
 
 import axios from "axios";
-import {getAuthHeader} from "../auth";
+import {getAuthHeader} from "./auth";
 
 export async function listPushes(repositoryId: string, azureToken: string) {
     const organizationName = await getOrganizationName();

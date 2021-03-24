@@ -1,7 +1,7 @@
 import * as SDK from "azure-devops-extension-sdk";
 import {CommonServiceIds, IProjectPageService} from "azure-devops-extension-api";
 import axios from "axios";
-import { getAuthHeader} from "../auth";
+import {getAuthHeader} from "./auth";
 
 // import {AUTH_HEADER} from "../auth";
 
@@ -34,9 +34,14 @@ export async function getCurrentProjectName(): Promise<string> {
     return "INVALID_GET_PROJECT_NAME";//supposed to be an error code
 }
 
-export async function listProjectsByOrganization(organizationName: string, token: string) {
+/**
+ * Fetch all projects
+ * @param organizationName
+ * @param azureToken
+ */
+export async function listProjectsByOrganization(organizationName: string, azureToken: string) {
     const url = `https://dev.azure.com/${organizationName}/_apis/projects?api-version=6.0`
-    let authHeader = getAuthHeader(token);
+    let authHeader = getAuthHeader(azureToken);
     const response = axios.get(url, {
             headers: authHeader
         }
@@ -45,6 +50,12 @@ export async function listProjectsByOrganization(organizationName: string, token
     return response;
 }
 
+/**
+ * fetch project by name
+ * @param organizationName
+ * @param projectName
+ * @param token
+ */
 export async function getProjectByName(organizationName: string, projectName: string, token: string) {
     //bad: can cause problems
     let foundProjects = await (await listProjectsByOrganization(organizationName, token)).data.value.filter((project: any) =>

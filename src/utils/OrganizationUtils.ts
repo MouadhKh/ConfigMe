@@ -1,7 +1,9 @@
 import * as SDK from "azure-devops-extension-sdk";
 
+/**
+ * Get Current organization name
+ */
 export async function getOrganizationName() {
-    // await SDK.init();
     return SDK.getAccessToken()
         .then(() => {
                 return SDK.getHost().name
