@@ -54,7 +54,7 @@ export const BasicModePipelineCreation = ({
                 const baseContainerStatus = await pipelineUtility.triggerPipeline("Base-Container", "Build Base-Container",
                     "main");
                 const buildDevMainProjectStatus = await pipelineUtility.triggerPipeline(projectName, `Build ${projectName}`, "dev");
-                const testMainProjectStatus = await pipelineUtility.triggerPipeline(projectName, `Test ${projectName}`, "test");
+                const testMainProjectStatus = await pipelineUtility.triggerPipeline(projectName, `Test ${projectName}`, "dev");
                 const buildProductionContainerStatus = await pipelineUtility.triggerPipeline(projectName, `Build Production Container`, "release");
                 const releaseMainProjectStatus = await pipelineUtility.triggerPipeline(projectName, `Release ${projectName}`, "release");
                 const responseStatus = [baseContainerStatus, buildDevMainProjectStatus, testMainProjectStatus, buildProductionContainerStatus, releaseMainProjectStatus];
