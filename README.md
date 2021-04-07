@@ -1,10 +1,13 @@
+<h2 align="center"><img src="./static/pipeline-management.png" /> ConfigMe</h2>
+
+
 This Azure DevOps extension automates infrastructure configurations(pipelines,docker images) on the basis of a template project. It offers also room for customization for advanced users.
 
 #### Requirements
 
 * NodeJS
 
-### Installation
+#### Installation
 
 1- Clone the repository
 
@@ -30,9 +33,10 @@ npm install
 
 5- Extension can be found under the Pipelines hub 
 
-<img src="C:\Users\kaiz3\AppData\Roaming\Typora\typora-user-images\image-20210407150453941.png" alt="image-20210407150453941" style="zoom:67%;" />
+ ![configMe](https://user-images.githubusercontent.com/50799773/113874547-342ae300-97b6-11eb-9cab-d64992dab2de.png)
 
-### Usage
+
+#### Usage
 
 The configuration wizard is made as intuitive as possible. The user should understand the steps and their purposes. For the less intuitive parts Hints :grey_question: are here to help. 
 
