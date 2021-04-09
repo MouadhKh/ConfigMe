@@ -1,7 +1,6 @@
 import * as React from "react";
 import {useReducer} from "react";
 import {RepositoriesData, RepositoriesDispatch} from "../types";
-import {ContextDevTool} from "react-context-devtool";
 import {repositoriesReducer} from "../reducers/repositoriesReducer";
 
 const initialRepositoriesState = {
@@ -17,9 +16,6 @@ export const RepositoriesProvider = ({children}: { children: JSX.Element }) => {
         <RepositoriesContext.Provider
             value={{repositoriesState: state, repositoryDispatch: dispatch}}>
             {children}
-            {/*TODO delete on production*/}
-            <ContextDevTool context={RepositoriesContext} id="repositoriesCtx"
-                            displayName="Repositories Context"/>
         </RepositoriesContext.Provider>
     );
 }

@@ -10,14 +10,11 @@ export default class RepositoryUtility extends AzureUtility {
     /**
      * Create Repository on CURRENT project
      * The SDK variant is very bad documented.Couldn't get it to work
-     * @param organizationName
-     * @param projectId
      * @param repoName
-     * @param skip
+     * @param skip : is set to true if the repository already exists AND is empty
      */
 
     public async createRepository(repoName: string, skip: boolean = false) {
-        //TODO delete the if
         if (skip) {
             return this.getRepositoryByName(repoName);
         }
@@ -32,16 +29,15 @@ export default class RepositoryUtility extends AzureUtility {
             .then((response) => {
                 console.log(`Repo ${body.name} created successfully`)
                 return response.data;
-            }).catch(() => {
-                console.log('url:' + url);
-                console.log('header:' + this.authHeader);
-                console.log('body:' + body.project.id);
-                console.log(`Error creating ${body.name}`)
+            }).catch((err) => {
+                console.log("Error creating repository:", err);
             });
 
     }
 
-
+    /**
+     * Returns a list of all existing repositories inside the current project
+     */
     public async listRepositories() {
         const url = `https://dev.azure.com/${this.organizationName}/${this.projectName}/_apis/git/repositories?api-version=6.0`
         return axios.get(url, {headers: this.authHeader})
@@ -107,7 +103,6 @@ export default class RepositoryUtility extends AzureUtility {
      */
     public async deleteRepository(repositoryName: string) {
         let repositoryId = await this.getRepositoryId(repositoryName);
-        console.log("in delete repository id", repositoryId)
         const url = `https://dev.azure.com/${this.organizationName}/${this.projectName}/_apis/git/repositories/${repositoryId}?api-version=6.0`;
         return axios.delete(url, {headers: this.authHeader}).then((response) => console.log(response));
     }

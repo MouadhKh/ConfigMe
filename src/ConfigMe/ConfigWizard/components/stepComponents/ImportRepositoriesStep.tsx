@@ -16,7 +16,7 @@ import {toast, ToastContainer} from "react-toastify";
 import {ModeContext} from "../../statemanagement/contexts/ModeContext";
 import {changeMode} from "../../statemanagement/actions/modeAction";
 import {WizardStepComponent} from "./WizardStepComponent";
-import BasicModeUtility from "../../../../utils/basicModeUtils/BasicModeUtility";
+import BasicModeUtility from "../../../../utils/BasicModeUtility";
 
 /**
  * Import repositories in two modes :
@@ -41,7 +41,6 @@ export const ImportRepositoriesStep = () => {
     const baseTargetRef: any = useRef(null);
     const mainSrcRef: any = useRef(null);
     const mainTargetRef: any = useRef(null);
-    const authCtx = useContext(AzureAuthContext);
     useEffect(() => {
         getOrganizationName().then(org => setOrganizationName(org));
         getCurrentProjectName().then(project => setProjectName(project));
@@ -57,9 +56,9 @@ export const ImportRepositoriesStep = () => {
         const repositoryUtility = await new RepositoryUtility(azureToken);
         let existingRepos = await repositoryUtility.listRepositories();
         let existingReposNames = existingRepos.map((repo: any) => repo.name);
-        if (existingReposNames.includes(repositoryName) && !await repositoryUtility.isRepositoryEmpty(repositoryName)) {
+        if (existingReposNames.includes(repositoryName) &&
+            !await repositoryUtility.isRepositoryEmpty(repositoryName)) {
             setDeletionConfirmation(true);
-            //TODO might cause problems
             return false;
         } else {
             const skip: boolean = existingReposNames.includes(repositoryName);

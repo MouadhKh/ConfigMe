@@ -8,7 +8,7 @@ import {useEffect, useState} from "react";
 import {getCurrentProjectName} from "../../../../utils/ProjectUtils";
 import {DockerAuthConsumer} from "../../statemanagement/contexts/DockerAuthContext";
 import {ModeConsumer} from "../../statemanagement/contexts/ModeContext";
-import BasicModeUtility from "../../../../utils/basicModeUtils/BasicModeUtility";
+import BasicModeUtility from "../../../../utils/BasicModeUtility";
 import {BLUE} from "../../styleConstants";
 
 /**

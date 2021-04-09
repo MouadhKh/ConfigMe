@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import FileUtility from "../../../../utils/FileUtility";
+import FilesUtility from "../../../../utils/FilesUtility";
 import BranchUtility from "../../../../utils/BranchUtility";
 import {Button} from "react-bootstrap";
 import * as React from "react";
@@ -13,6 +13,7 @@ import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import {EditorComponent} from "../modals/EditorComponent";
 import {FileObject} from "../../../../utils/types";
+import {BranchSelector} from "../utilityComponents/BranchSelector";
 
 
 interface IDockerManagementComponent {
@@ -25,7 +26,7 @@ export const AdvancedDockerManagementComponent = ({repositoryName, azureToken}: 
     const [branchNames, setBranchNames] = useState([]);
     const [showEditorCreate, setShowEditorCreate] = useState(false);
     const [files, setFiles]: any = useState([]);
-    const fileUtility: FileUtility = new FileUtility(azureToken);
+    const fileUtility: FilesUtility = new FilesUtility(azureToken);
     const branchUtility: BranchUtility = new BranchUtility(azureToken);
     useEffect(() => {
         const isMounted = true;
@@ -35,7 +36,6 @@ export const AdvancedDockerManagementComponent = ({repositoryName, azureToken}: 
         }
     }, [selectedBranchName]);
     useEffect(() => {
-            //TODO interesting pattern
             const isMounted = true;
             if (isMounted) {
                 branchUtility.getBranchNames(repositoryName)
@@ -54,23 +54,24 @@ export const AdvancedDockerManagementComponent = ({repositoryName, azureToken}: 
         azureToken: string
     }
 
-    //TODO extract component
-    const BranchSelector = ({branchNames}: IBranchSelector) => {
-        return (
-            <div className="row">
-                <label style={BLUE} className="mr-3">Select a branch </label>
-                <Dropdown options={branchNames} onChange={(option) => {
-                    setSelectedBranchName(option.value)
-                }} value={selectedBranchName} placeholder="Select Branch"/>
-            </div>
-        );
-    }
+    // const BranchSelector = ({branchNames}: IBranchSelector) => {
+    //     return (
+    //         <div className="row">
+    //             <label style={BLUE} className="mr-3">Select a branch </label>
+    //             <Dropdown options={branchNames} onChange={(option) => {
+    //                 setSelectedBranchName(option.value)
+    //             }} value={selectedBranchName} placeholder="Select Branch"/>
+    //         </div>
+    //     );
+    // }
     return (
         <div>
             <Container className="col-10 m-4">
                 <BranchSelector repositoryName={repositoryName}
+                                selectBranch={setSelectedBranchName}
+                                selectedBranch={selectedBranchName}
                                 branchNames={branchNames}
-                                azureToken={azureToken}/>
+                                />
                 <Row>
                     {files.map((file: FileObject) => {
                         return (<Column className="m-3" key={file.objectId}>

@@ -8,10 +8,8 @@ import {
 
 export const dockerAuthReducer = (state: DockerAuthenticationData, action:
     DockerAuthenticationAction) => {
-    console.log("action", action);
     switch (action.type) {
         case AUTHENTICATE_DOCKER:
-            console.log("authentication action entered");
             return {
                 ...state,
                 dockerUsername: action.payload.dockerUsername,

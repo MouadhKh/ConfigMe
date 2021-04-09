@@ -42,12 +42,10 @@ export async function getCurrentProjectName(): Promise<string> {
 export async function listProjectsByOrganization(organizationName: string, azureToken: string) {
     const url = `https://dev.azure.com/${organizationName}/_apis/projects?api-version=6.0`
     let authHeader = getAuthHeader(azureToken);
-    const response = axios.get(url, {
+    return axios.get(url, {
             headers: authHeader
         }
     );
-    console.log("response cors:", response);
-    return response;
 }
 
 /**

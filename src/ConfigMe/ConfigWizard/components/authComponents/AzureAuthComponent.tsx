@@ -15,7 +15,7 @@ const CREATE_PAT_LINK = "https://docs.microsoft.com/en-us/azure/devops/organizat
 
 export const AzureAuthComponent = () => {
 
-    const tokenInput: any = useRef(null);//Todo can be problematic
+    const tokenInput: any = useRef(null);
     const [token, setToken] = useState("");
     const [authorized, setAuthorized] = useState(false);
     const {azureState, azureDispatch} = useContext(AzureAuthContext);
@@ -61,9 +61,9 @@ export const AzureAuthComponent = () => {
                 />
                 <InputGroup.Append>
                     <Button variant="outline-success" onClick={() => {
+                        setToken(tokenInput.current.value);
                         isAuthorized(tokenInput.current.value)
                             .then((result: boolean) => {
-                                setToken(tokenInput.current.value);
                                 if (result) {
                                     azureDispatch(authenticateAzure({azureToken: tokenInput.current.value}))
                                     setAuthorized(true);

@@ -37,7 +37,6 @@ export const WizardStepComponent = ({
         let componentsCopy = components;
         for (let i = 0; i < componentsCopy.length; i++) {
             if (i % 2 == 1) {
-                console.log("entered");
                 componentsCopy = insert(componentsCopy, i, <hr
                     className="mb-4 mt-4 align-items-center"/>);
             }
@@ -48,8 +47,7 @@ export const WizardStepComponent = ({
     return (
         <div>
             <Card border="dark" className="text-center">
-                <Card.Header style={{backgroundColor: "#72A1E5"}}><i>Project
-                    Configuration Wizard</i> <GrConfigure/></Card.Header>
+                <Card.Header style={{backgroundColor: "#72A1E5"}}><i>ConfigMe Wizard</i> <GrConfigure/></Card.Header>
                 <Card.Body>
                     <Card.Title className="mb-4">{title}</Card.Title>
                     <div>

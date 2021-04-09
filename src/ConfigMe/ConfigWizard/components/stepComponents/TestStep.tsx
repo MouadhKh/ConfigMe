@@ -4,7 +4,7 @@
 import * as React from "react";
 import {useEffect} from "react";
 import RepositoryUtility from "../../../../utils/RepositoryUtility";
-import FileUtility from "../../../../utils/FileUtility";
+import FilesUtility from "../../../../utils/FilesUtility";
 import PipelineUtility from "../../../../utils/PipelineUtility";
 // import {BasicModePipelineManagementComponent} from "../basicModeComponents/BasicModePipelineManagementComponent";
 // import {BasicModeDockerManagementComponent} from "../basicModeComponents/BasicModeDockerManagementComponent";
@@ -89,9 +89,8 @@ export const TestStep = () => {
     useEffect(() => {
         const func = async () => {
             const repositoryUtility = await new RepositoryUtility("4e4pjak7fc33sbfchfteyztul6wliy4szimid6saxwj62tkhzllq");
-            const fileUtility: FileUtility = await new FileUtility("4e4pjak7fc33sbfchfteyztul6wliy4szimid6saxwj62tkhzllq");
+            const fileUtility: FilesUtility = await new FilesUtility("4e4pjak7fc33sbfchfteyztul6wliy4szimid6saxwj62tkhzllq");
             fileUtility.getAllFiles("ConfigTest", "dev").then(response => console.log("files", response));
-            repositoryUtility.listRepositories().then((response) => console.log("response rep:", response))
             const pipelinesUtility = await new PipelineUtility("4e4pjak7fc33sbfchfteyztul6wliy4szimid6saxwj62tkhzllq");
             pipelinesUtility.listPipelines().then(response => console.log("pipeliiines:", response));
         }

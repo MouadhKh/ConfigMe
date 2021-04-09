@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "ConfigMeExt",
   "publisher": "MouadhKh",
-  "version": "5.4.2",
+  "version": "5.4.9",
   "name": "ConfigMe",
 
   "description": "Project Configuration tool",
@@ -19,7 +19,7 @@
   },
   "content": {
     "details": {
-      "path": "overview.md"
+      "path": "README.md"
     }
   },
   "files": [

@@ -17,7 +17,6 @@ export const BranchSelector = ({branchNames, selectBranch, selectedBranch}: IBra
         <div className="row">
             <label style={BLUE} className="mr-3">Select a branch </label>
             <Dropdown options={branchNames} onChange={(option) => {
-                //TODO refactor with setSelect.. as a prop
                 selectBranch(option.value)
             }} value={selectedBranch} placeholder="Select Branch"/>
         </div>

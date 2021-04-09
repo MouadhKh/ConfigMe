@@ -1,9 +1,9 @@
 import axios from "axios";
 import DefinitionUtility from "./DefinitionUtility";
-import {getDefaultAgentPool} from "./AgentPoolUtils";
 import AzureUtility from "./AzureUtility";
 import {appendAsyncConstructor} from "async-constructor/lib/es2017/append";
 import RepositoryUtility from "./RepositoryUtility";
+import AgentPoolUtility from "./AgentPoolUtility";
 
 /**
  * Responsible for creating,triggering and deleting pipelines
@@ -26,9 +26,8 @@ export default class PipelineUtility extends AzureUtility {
     public async listPipelines() {
         const url = `https://dev.azure.com/${this.organizationName}/${this.projectName}/_apis/pipelines?api-version=6.0-preview.1`
         return axios.get(url, {headers: this.authHeader}).then((response: any) => {
-            console.log("response of pipelines:", response)
             return response.data.value;
-        });
+        }).catch(err => console.log("Fetching pipelines failed with error:", err));
     }
 
     /**
@@ -36,7 +35,8 @@ export default class PipelineUtility extends AzureUtility {
      * It offers a more flexible way to search for yml files since the branchName can be a parameter
      */
     public async createPipelineWithBranch(repositoryName: string, pipelineName: string, path: string, branchName: string) {
-        const defaultAgentPool = await getDefaultAgentPool(this.azureToken);
+        const agentPoolUtility: AgentPoolUtility = await new AgentPoolUtility(this.azureToken);
+        const defaultAgentPool = await agentPoolUtility.getDefaultAgentPool();
         const repositoryId = await this.repositoryUtility.getRepositoryId(repositoryName);
         const url = `https://dev.azure.com/${this.organizationName}/${this.projectName}/_apis/build/definitions?api-version=6.0`
         const body = {
@@ -84,7 +84,6 @@ export default class PipelineUtility extends AzureUtility {
             await this.deletePipeline(repositoryName, pipelineName)
         }
         return this.createPipelineWithBranch(repositoryName, pipelineName, ymlFilePath, branchName).then(response => {
-            console.log("delete and create response:", response)
             return response.status;
         });
     }

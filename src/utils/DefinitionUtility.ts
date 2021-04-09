@@ -19,11 +19,13 @@ export default class DefinitionUtility extends AzureUtility {
     public getDefinitionByName(definitionName: string) {
         const url = `https://dev.azure.com/${this.organizationName}/${this.projectName}/_apis/build/definitions?name=${definitionName}&api-version=6.0`
         return axios.get(url, {headers: this.authHeader}).then((response: any) => {
-            console.log("response:", response);
             if (response.data.value.length > 0) {
                 return response.data.value[0];
             } else
                 return "DEFINITION_NOT_FOUND";
-        });
+        })
+            .catch((err) => {
+                console.log("fetching definition failed with HTTP error ", (err.response.status));
+            });
     }
 }

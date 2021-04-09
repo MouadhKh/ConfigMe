@@ -7,7 +7,7 @@ import {GrDocumentConfig} from "react-icons/all";
 import "react-toastify/dist/ReactToastify.css";
 import {toast, ToastContainer} from "react-toastify";
 import {toastOptions} from "../messages/toasts";
-import BasicModeUtility from "../../../../utils/basicModeUtils/BasicModeUtility";
+import BasicModeUtility from "../../../../utils/BasicModeUtility";
 import BranchUtility from "../../../../utils/BranchUtility";
 
 
@@ -49,9 +49,9 @@ export const BasicModeDockerManagementComponent = ({
         []);
     const showFeedBack = (success: boolean) => {
         if (success) {
-            toast.success(`${repositoryName.toLowerCase()} : Docker files configuration finished with success`, toastOptions);
+            toast.success(`${repositoryName} : Docker files configuration finished with success`, toastOptions);
         } else {
-            toast.error(`${repositoryName.toLocaleLowerCase()} : Docker files configuration failed`, toastOptions);
+            toast.error(`${repositoryName} : Docker files configuration failed`, toastOptions);
         }
     }
     return (

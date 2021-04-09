@@ -9,7 +9,6 @@ import ServiceEndpointUtility from "../../../../utils/ServiceEndpointUtility";
 
 import {HelpComponent} from "../utilityComponents/HelpComponent";
 import {AiFillEye} from "react-icons/all";
-import {authenticate} from "../../../../utils/basicModeUtils/DockerUtils";
 
 const DOCKERHUB_SIGNUP = "https://hub.docker.com/signup";
 
@@ -19,7 +18,6 @@ interface IDockerAuthComponent {
 }
 
 export const DockerAuthComponent = ({azureToken, azureAuthorized}: IDockerAuthComponent) => {
-//TODO : investigate more on finding a way to authenticate in Docker
     const [authorized, setAuthorized] = useState(false)
     const [form, setForm] = useState({username: "", password: "", dockerhub: ""})
     const [errors, setErrors] = useState({username: "", password: "", dockerhub: ""})
@@ -119,7 +117,7 @@ export const DockerAuthComponent = ({azureToken, azureAuthorized}: IDockerAuthCo
             <Button disabled={!azureAuthorized} variant="outline-success" onClick={async () => {
                 setAuthorizationAttempt(true);
                 if (handleAuthorize()) {
-                    const serviceEndpointUtility: ServiceEndpointUtility = new ServiceEndpointUtility(azureToken);
+                    const serviceEndpointUtility: ServiceEndpointUtility = await new ServiceEndpointUtility(azureToken);
                     serviceEndpointUtility.createDockerRegistry(dockerHubRef.current.value, userNameRef.current.value, passwordRef.current.value)
                         .then((response) => {
                             if (response == 200) {
