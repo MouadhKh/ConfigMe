@@ -5,7 +5,6 @@ import {
     DockerAuthenticationData,
     DockerAuthenticationDispatch
 } from "../types";
-import {ContextDevTool} from "react-context-devtool";
 
 const initialDockerState = {
     dockerUsername: "",
@@ -20,9 +19,6 @@ export const DockerAuthProvider = ({children}: { children: JSX.Element }) => {
     return (
         <DockerAuthContext.Provider value={{dockerState: state, dockerDispatch: dispatch}}>
             {children}
-            {/*TODO delete on production*/}
-            <ContextDevTool context={DockerAuthContext} id="dockerAuthCtx"
-                            displayName="Docker Authentication Context"/>
         </DockerAuthContext.Provider>
     );
 }

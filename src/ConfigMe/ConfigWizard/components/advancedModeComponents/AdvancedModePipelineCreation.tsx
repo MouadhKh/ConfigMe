@@ -4,12 +4,9 @@ import {FileRepresentationComponent} from "./FileRepresentationComponent";
 import "react-toastify/dist/ReactToastify.css";
 
 import {Container} from "react-bootstrap-grid-component/dist/Container";
-//TODO pull those kind of imports to configwizard.tsx
 import 'react-dropdown/style.css';
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
-import {BLUE} from "../../styleConstants";
-import Dropdown from "react-dropdown";
 import {Button, FormControl, InputGroup} from "react-bootstrap";
 import {GoDiffAdded} from "react-icons/all";
 import PipelineUtility from "../../../../utils/PipelineUtility";
@@ -17,9 +14,9 @@ import {toast, ToastContainer} from "react-toastify";
 import {toastOptions} from "../messages/toasts";
 import BranchUtility from "../../../../utils/BranchUtility";
 import ServiceEndpointUtility from "../../../../utils/ServiceEndpointUtility";
-import FileUtility from "../../../../utils/FileUtility";
+import FilesUtility from "../../../../utils/FilesUtility";
 import {FileObject} from "../../../../utils/types";
-import {IBranchSelector} from "../utilityComponents/BranchSelector";
+import {BranchSelector} from "../utilityComponents/BranchSelector";
 
 interface IAdvancedModePipelineCreation {
     repositoryName: string,
@@ -30,7 +27,8 @@ interface IAdvancedModePipelineCreation {
 /**
  * Custom Pipeline creation
  * Features :
- * - Edit pipelin
+ * - Edit pipeline
+ * - Create and trigger pipeline from file
  */
 export const AdvancedModePipelineCreation = ({
                                                  repositoryName,
@@ -45,7 +43,7 @@ export const AdvancedModePipelineCreation = ({
     const pipelineRef: any = useRef(null);
     useEffect(() => {
         const fetchPipelineFiles = async () => {
-            const fileUtility: FileUtility = await new FileUtility(azureToken);
+            const fileUtility: FilesUtility = await new FilesUtility(azureToken);
             fileUtility.getPipelineFiles(repositoryName, selectedBranchName)
                 .then(response => setFiles(response))
         }
@@ -74,18 +72,6 @@ export const AdvancedModePipelineCreation = ({
         }
         initEndPoint().then(() => console.log("endpoint id set successfully"));
     }, [])
-    //TODO extract with setSelect as prop and selectedBranchName as Prop
-    const BranchSelector = ({branchNames}: IBranchSelector) => {
-        return (
-            <div className="row">
-                <label style={BLUE} className="mr-3">Select a branch </label>
-                <Dropdown options={branchNames} onChange={(option) => {
-                    //TODO refactor with setSelect.. as a prop
-                    setSelectedBranchName(option.value)
-                }} value={selectedBranchName} placeholder="Select Branch"/>
-            </div>
-        );
-    }
     const showFeedback = (triggerStatus: boolean, pipelineName: string) => {
         if (triggerStatus) {
             toast.success(`Pipeline ${pipelineName} created and triggered successfully`, toastOptions);
@@ -98,8 +84,6 @@ export const AdvancedModePipelineCreation = ({
         const createAndDeleteStatus = await pipelineUtility.deleteAndCreatePipeline(repositoryName, selectedBranchName,
             pipelineRef.current.value, file.path);
         if (createAndDeleteStatus) {
-            console.log("pipeline Ref:", pipelineRef.current.value)
-            console.log("current pipelineName", currentPipelineName);
             const grantPermissionStatus = await pipelineUtility.grantPipelinesPermissionToServiceEndpoint(endpointId, repositoryName,
                 [currentPipelineName])
             if (grantPermissionStatus == 200) {

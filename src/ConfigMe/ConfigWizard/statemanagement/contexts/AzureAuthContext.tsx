@@ -2,7 +2,6 @@ import * as React from "react";
 import {azureAuthReducer} from "../reducers/authReducer";
 import {useReducer} from "react";
 import {AzureAuthenticationData, AzureAuthenticationDispatch} from "../types";
-import {ContextDevTool} from "react-context-devtool";
 
 const initialAzureState = {
     azureToken: ""
@@ -15,9 +14,6 @@ export const AzureAuthProvider = ({children}: { children: JSX.Element }) => {
     return (
         <AzureAuthContext.Provider value={{azureState: state, azureDispatch: dispatch}}>
             {children}
-            {/*TODO delete on production*/}
-            <ContextDevTool context={AzureAuthContext} id="azureAuthCtx"
-                            displayName="Azure Authentication Context"/>
         </AzureAuthContext.Provider>
     );
 }

@@ -8,7 +8,7 @@ import {useEffect, useState} from "react";
 import {AiOutlineFileAdd} from "react-icons/all";
 import 'react-dropdown/style.css';
 import {EditorComponent} from "../modals/EditorComponent";
-import FileUtility from "../../../../utils/FileUtility";
+import FilesUtility from "../../../../utils/FilesUtility";
 import BranchUtility from "../../../../utils/BranchUtility";
 import {FileObject} from "../../../../utils/types";
 import {BranchSelector} from "../utilityComponents/BranchSelector";
@@ -24,7 +24,7 @@ export const AdvancedPipelineManagementComponent = ({repositoryName, azureToken}
     const [branchNames, setBranchNames] = useState([]);
     const [files, setFiles]: any = useState([]);
     const [showEditorCreate, setShowEditorCreate] = useState(false);
-    const fileUtility: FileUtility = new FileUtility(azureToken);
+    const fileUtility: FilesUtility = new FilesUtility(azureToken);
     const branchUtility: BranchUtility = new BranchUtility(azureToken);
     useEffect(() => {
         fileUtility.getPipelineFiles(repositoryName, selectedBranchName)

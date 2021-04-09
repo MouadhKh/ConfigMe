@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import {toast, ToastContainer} from "react-toastify";
 import {toastOptions} from "../messages/toasts";
 import {GrDocumentConfig} from "react-icons/all";
-import BasicModeUtility from "../../../../utils/basicModeUtils/BasicModeUtility";
+import BasicModeUtility from "../../../../utils/BasicModeUtility";
 
 
 export interface IBasicPipelineManagement {
@@ -36,7 +36,6 @@ export const BasicModePipelineManagementComponent = ({
                 branchUtility.getBranchNames(repositoryNames[1]).then(response =>
                     setMainBranchNames(response));
             }
-            //TODO interesting pattern
             const isMounted = true;
             if (isMounted) {
                 initBranchNames().then(() =>

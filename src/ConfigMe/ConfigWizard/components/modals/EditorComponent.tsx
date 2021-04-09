@@ -11,7 +11,7 @@ import {toastOptions} from "../messages/toasts";
 import {toast, ToastContainer} from "react-toastify";
 import {BLUE} from "../../styleConstants";
 import {FileObject} from "../../../../utils/types";
-import FileUtility from "../../../../utils/FileUtility";
+import FilesUtility from "../../../../utils/FilesUtility";
 
 
 interface IFileEditor {
@@ -53,7 +53,6 @@ const PathComponent = ({type, refObject}: IRenderPath) => {
     }
     return <></>;
 }
-//TODO solve problem with onSave when creating
 export const EditorComponent = ({
                                     content,
                                     title,
@@ -71,17 +70,17 @@ export const EditorComponent = ({
     const editorValue = useState("");
     const showFeedBack = (saveFileResult: boolean, path: string) => {
         if (saveFileResult) {
-            const Message = () => (<div>pushed <b>{FileUtility.extractFileName(path)}</b> successfully</div>);
+            const Message = () => (<div>pushed <b>{FilesUtility.extractFileName(path)}</b> successfully</div>);
             toast.success(
                 <Message/>, {...toastOptions, toastId: '201'});
         } else {
             const Message = () => (
-                <div>An Error occured while pushing <b>{FileUtility.extractFileName(path)} </b></div>);
+                <div>An Error occured while pushing <b>{FilesUtility.extractFileName(path)} </b></div>);
             toast.error(<Message/>, ({...toastOptions, toastId: '409'}))
         }
     }
     const saveFile = async () => {
-        const fileUtility: FileUtility = await new FileUtility(azureToken);
+        const fileUtility: FilesUtility = await new FilesUtility(azureToken);
         if (type === "EDIT") {
             const status = await fileUtility.updateFile(fileObj!, repositoryName, branchName, editorValue[0])
             return status == 201

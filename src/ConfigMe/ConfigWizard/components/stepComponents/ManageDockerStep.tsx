@@ -5,7 +5,7 @@ import {AdvancedDockerManagementComponent} from "../advancedModeComponents/Advan
 import {Accordion, Card} from "react-bootstrap";
 import {BasicModeDockerManagementComponent} from "../basicModeComponents/BasicModeDockerManagementComponent";
 import {DockerAuthConsumer} from "../../statemanagement/contexts/DockerAuthContext";
-import BasicModeUtility from "../../../../utils/basicModeUtils/BasicModeUtility";
+import BasicModeUtility from "../../../../utils/BasicModeUtility";
 import {ModeConsumer} from "../../statemanagement/contexts/ModeContext";
 import {BLUE} from "../../styleConstants";
 
